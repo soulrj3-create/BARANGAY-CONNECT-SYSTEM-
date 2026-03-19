@@ -1,273 +1,256 @@
 // ============================================================
-//  js/requests.js  –  Document Request Form (3-step wizard)
+//  js/requests.js  –  Request Form (3-step wizard)
 // ============================================================
 
-let allDocTypes    = [];
-let selectedDoc    = null;
-let selectedPay    = null;   // 'gcash' | 'maya' | null
-let currentStep    = 1;
-let gcashNumber    = '0917-123-4567';
-let mayaNumber     = '0998-765-4321';
+let selectedDocType = null;
+let currentStep     = 1;
+let selectedPayMethod = null;
 
-// ── INIT REQUEST PANEL ────────────────────────────────────
+// ── INIT REQUEST FORM ─────────────────────────────────────
 async function initRequestForm() {
-  selectedDoc = null;
-  selectedPay = null;
-  currentStep = 1;
-  resetFormFields();
-  goStep(1);
+  selectedDocType   = null;
+  selectedPayMethod = null;
+  currentStep       = 1;
 
-  // Show loading state
+  // Reset steps UI
+  goStepUI(1);
+
+  // Clear fields
+  ['rf-name','rf-dob','rf-phone','rf-addr','rf-purpose','pay-ref'].forEach(id => {
+    const el = g(id); if (el) el.value = '';
+  });
+  if (g('rf-civil')) g('rf-civil').value = 'Single';
+
+  // Prefill from current user
+  if (currentUser) {
+    if (g('rf-name'))  g('rf-name').value  = (currentUser.first_name || '') + ' ' + (currentUser.last_name || '');
+    if (g('rf-phone')) g('rf-phone').value = currentUser.phone || '';
+    if (g('rf-addr'))  g('rf-addr').value  = currentUser.address || '';
+  }
+
+  // Load document types
   const grid = g('doc-type-grid');
-  if (grid) grid.innerHTML = '<div style="color:var(--muted);font-size:13.5px;grid-column:1/-1">Loading document types…</div>';
+  if (grid) grid.innerHTML = '<div style="color:var(--muted);font-size:13.5px">Loading…</div>';
 
-  // Load doc types from API
   const res = await GET('requests', 'doc_types');
-  if (res.success && res.doc_types) {
-    allDocTypes = res.doc_types;
-    buildDocGrid();
-  } else {
-    if (grid) grid.innerHTML = '<div style="color:var(--danger);font-size:13.5px;grid-column:1/-1">⚠️ Failed to load document types. Please refresh.</div>';
-    toast('Failed to load document types.', 'error');
-  }
-
-  // Load payment numbers from settings (non-blocking, best-effort)
-  loadPaymentNumbers();
-}
-
-async function loadPaymentNumbers() {
-  try {
-    // FIX: settings_get now only requires any authenticated user (not admin-only)
-    const res = await GET('reports', 'settings_get');
-    if (res.success && res.settings) {
-      gcashNumber = res.settings.gcash_number || gcashNumber;
-      mayaNumber  = res.settings.maya_number  || mayaNumber;
-    }
-  } catch (e) {
-    // silently fall back to hardcoded defaults
-  }
-}
-
-// ── BUILD DOC GRID ────────────────────────────────────────
-function buildDocGrid() {
-  const grid = g('doc-type-grid');
-  if (!grid) return;
-
-  if (!allDocTypes || allDocTypes.length === 0) {
-    grid.innerHTML = '<div style="color:var(--muted);font-size:13.5px;grid-column:1/-1">No document types available.</div>';
+  if (!res.success || !res.doc_types) {
+    if (grid) grid.innerHTML = '<div style="color:var(--danger);font-size:13.5px">Failed to load document types.</div>';
     return;
   }
 
-  grid.innerHTML = allDocTypes.map(d => `
-    <div class="doc-card" id="dc-${d.id}" onclick="pickDoc(${d.id})">
-      <div class="di">${d.icon}</div>
-      <div class="dn">${d.name}</div>
-      <div class="df">${parseFloat(d.fee) === 0 ? 'FREE' : '₱' + parseFloat(d.fee).toFixed(2)}</div>
-      <div class="dd">⏱ ${d.processing_days} day${d.processing_days > 1 ? 's' : ''} · ${d.description || ''}</div>
-    </div>`).join('');
+  if (grid) {
+    grid.innerHTML = res.doc_types.map(dt => `
+      <div class="doc-card" id="dc-${dt.id}" onclick="selectDocType(${dt.id})">
+        <div class="di">${dt.icon}</div>
+        <div class="dn">${dt.name}</div>
+        <div class="df">${parseFloat(dt.fee) === 0 ? '🆓 FREE' : '₱' + parseFloat(dt.fee).toFixed(2)}</div>
+        <div class="dd">${dt.description || ''} · ${dt.processing_days} day${dt.processing_days > 1 ? 's' : ''}</div>
+      </div>`).join('');
+    // Store doc types on window for later use
+    window._docTypes = res.doc_types;
+  }
 }
 
-// ── PICK DOC TYPE ─────────────────────────────────────────
-function pickDoc(id) {
-  selectedDoc = allDocTypes.find(d => parseInt(d.id) === parseInt(id));
-  if (!selectedDoc) return;
+// ── SELECT DOCUMENT TYPE ──────────────────────────────────
+function selectDocType(id) {
+  selectedDocType = (window._docTypes || []).find(d => d.id == id);
+  if (!selectedDocType) return;
 
+  // Highlight selected card
   document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('sel'));
-  const el = g('dc-' + id);
-  if (el) el.classList.add('sel');
-
-  setTimeout(() => goStep(2), 200);
+  const card = g('dc-' + id);
+  if (card) card.classList.add('sel');
 }
 
 // ── STEP NAVIGATION ───────────────────────────────────────
-function goStep(n) {
-  currentStep = n;
+function goStep(step) {
+  // Validate current step before advancing
+  if (step > currentStep) {
+    if (!validateStep(currentStep)) return;
+  }
+  currentStep = step;
+  goStepUI(step);
 
-  // Step indicators
-  [1, 2, 3].forEach(i => {
+  // When reaching step 3, build payment UI
+  if (step === 3) buildPaymentUI();
+}
+
+function validateStep(step) {
+  if (step === 1) {
+    if (!selectedDocType) { toast('Please select a document type.', 'error'); return false; }
+  }
+  if (step === 2) {
+    const name    = v('rf-name').trim();
+    const dob     = v('rf-dob').trim();
+    const phone   = v('rf-phone').trim();
+    const address = v('rf-addr').trim();
+    const purpose = v('rf-purpose').trim();
+    if (!name)    { toast('Full name is required.',     'error'); return false; }
+    if (!dob)     { toast('Date of birth is required.', 'error'); return false; }
+    if (!phone)   { toast('Contact number is required.','error'); return false; }
+    if (!address) { toast('Address is required.',       'error'); return false; }
+    if (!purpose) { toast('Purpose is required.',       'error'); return false; }
+  }
+  return true;
+}
+
+function goStepUI(step) {
+  // Show/hide step panels
+  ['req-s1','req-s2','req-s3'].forEach((id, i) => {
+    const el = g(id);
+    if (el) el.style.display = (i + 1 === step) ? 'block' : 'none';
+  });
+
+  // Step numbers styling
+  for (let i = 1; i <= 3; i++) {
     const sn = g('sn' + i);
-    if (!sn) return;
-    sn.classList.remove('done', 'active');
-    if (i < n)        sn.classList.add('done');
-    else if (i === n) sn.classList.add('active');
-  });
-  [1, 2].forEach(i => {
+    if (!sn) continue;
+    sn.classList.remove('active','done');
+    if (i < step)  sn.classList.add('done');
+    if (i === step) sn.classList.add('active');
+  }
+
+  // Step connectors
+  for (let i = 1; i <= 2; i++) {
     const sc = g('sc' + i);
-    if (sc) { sc.classList.remove('done'); if (i < n) sc.classList.add('done'); }
-  });
-
-  const s1 = g('req-s1'); if (s1) s1.style.display = n === 1 ? '' : 'none';
-  const s2 = g('req-s2'); if (s2) s2.style.display = n === 2 ? '' : 'none';
-  const s3 = g('req-s3'); if (s3) s3.style.display = n === 3 ? '' : 'none';
-
-  if (n === 2 && selectedDoc) populateStep2();
-  if (n === 3 && selectedDoc) populateStep3();
-}
-
-function populateStep2() {
-  // Pre-fill name/phone/address from session
-  if (currentUser) {
-    const nameEl = g('rf-name');
-    if (nameEl && !nameEl.value) {
-      nameEl.value = (currentUser.first_name + ' ' + currentUser.last_name).trim();
-    }
-    const phoneEl = g('rf-phone');
-    if (phoneEl && !phoneEl.value && currentUser.phone) {
-      phoneEl.value = currentUser.phone;
-    }
-    const addrEl = g('rf-addr');
-    if (addrEl && !addrEl.value && currentUser.address) {
-      addrEl.value = currentUser.address;
-    }
+    if (!sc) continue;
+    sc.classList.toggle('done', step > i);
   }
 
-  // Show selected doc summary
-  const box = g('req-selected-doc');
-  if (box && selectedDoc) {
-    const fee = parseFloat(selectedDoc.fee);
-    box.innerHTML = `
-      <div style="background:var(--surface2);border-radius:11px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:18px">
-        <span style="font-size:28px">${selectedDoc.icon}</span>
-        <div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px">${selectedDoc.name}</div>
-          <div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:2px">
-            ${fee === 0 ? 'FREE' : '₱' + fee.toFixed(2)}
-            &nbsp;·&nbsp; ⏱ ${selectedDoc.processing_days} day${selectedDoc.processing_days > 1 ? 's' : ''} processing
-          </div>
-        </div>
+  // If step 2: show selected doc summary
+  if (step === 2 && selectedDocType) {
+    const box = g('req-selected-doc');
+    if (box) {
+      box.innerHTML = `<div class="alert alert-success" style="margin-bottom:14px">
+        ${selectedDocType.icon} <strong>${selectedDocType.name}</strong> —
+        ${parseFloat(selectedDocType.fee) === 0 ? '<strong>FREE</strong>' : '₱' + parseFloat(selectedDocType.fee).toFixed(2)}
+        · ${selectedDocType.processing_days} day processing
       </div>`;
+    }
   }
 }
 
-function populateStep3() {
-  const isFree = parseFloat(selectedDoc.fee) === 0;
+// ── BUILD PAYMENT UI (step 3) ─────────────────────────────
+async function buildPaymentUI() {
+  if (!selectedDocType) return;
 
-  // Fee summary
+  const fee    = parseFloat(selectedDocType.fee);
+  const isFree = fee === 0;
+
+  // Fee display
   const feeBox = g('pay-fee-box');
   if (feeBox) {
-    feeBox.innerHTML = `
-      <div style="background:var(--surface2);border-radius:11px;padding:14px 18px;
-        display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="color:var(--muted2);font-size:13.5px">Document Fee</div>
-        <div style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--accent)">
-          ${isFree ? 'FREE' : '₱' + parseFloat(selectedDoc.fee).toFixed(2)}
-        </div>
-      </div>`;
+    feeBox.innerHTML = `<div class="alert alert-info" style="margin-bottom:14px">
+      ${selectedDocType.icon} <strong>${selectedDocType.name}</strong> —
+      Fee: <strong>${isFree ? 'FREE' : '₱' + fee.toFixed(2)}</strong>
+    </div>`;
   }
 
-  const freeMsg   = g('pay-free-msg');
-  const payMethod = g('pay-method-section');
-  const qrSec     = g('pay-qr-section');
+  if (isFree) {
+    const freeMsg = g('pay-free-msg');
+    const paySection = g('pay-method-section');
+    if (freeMsg) freeMsg.style.display = 'block';
+    if (paySection) paySection.style.display = 'none';
+  } else {
+    const freeMsg = g('pay-free-msg');
+    const paySection = g('pay-method-section');
+    if (freeMsg) freeMsg.style.display = 'none';
+    if (paySection) paySection.style.display = 'block';
+    // Reset payment selection
+    selectedPayMethod = null;
+    document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('sel'));
+    const qrSec = g('pay-qr-section');
+    if (qrSec) qrSec.style.display = 'none';
+  }
 
-  if (freeMsg)   freeMsg.style.display   = isFree ? '' : 'none';
-  if (payMethod) payMethod.style.display = isFree ? 'none' : '';
-  if (qrSec)     qrSec.style.display     = 'none';
-
-  // Reset payment selection
-  selectedPay = isFree ? 'free' : null;
-  document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('sel'));
-  const payRef = g('pay-ref');
-  if (payRef) payRef.value = '';
+  // Load GCash/Maya numbers from settings
+  const res = await GET('reports', 'settings_get');
+  if (res.success && res.settings) {
+    window._paySettings = res.settings;
+  }
 }
 
 // ── SELECT PAYMENT METHOD ─────────────────────────────────
 function selectPay(method) {
-  selectedPay = method;
+  selectedPayMethod = method;
   document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('sel'));
   const card = g('pc-' + method);
   if (card) card.classList.add('sel');
 
-  const fee = parseFloat(selectedDoc?.fee || 0);
-  const amountEl = g('pay-amount-text');
-  if (amountEl) amountEl.textContent = '₱' + fee.toFixed(2);
-
   const qrSec = g('pay-qr-section');
-  if (qrSec) qrSec.style.display = '';
+  if (qrSec) qrSec.style.display = 'block';
 
-  const payRef = g('pay-ref');
-  if (payRef) payRef.value = '';
+  const settings = window._paySettings || {};
+  const fee = parseFloat(selectedDocType?.fee || 0);
 
-  const qrIcon      = g('pay-qr-icon');
-  const infoText    = g('pay-info-text');
-  const accountText = g('pay-account-text');
+  if (g('pay-amount-text')) g('pay-amount-text').textContent = '₱' + fee.toFixed(2);
 
   if (method === 'gcash') {
-    if (qrIcon)      qrIcon.innerHTML       = gcashQR();
-    if (infoText)    infoText.textContent    = 'Scan QR Code or send to the number below via GCash';
-    if (accountText) accountText.textContent = 'GCash Number: ' + gcashNumber;
+    const num  = settings.gcash_number || '0917-123-4567';
+    const name = settings.gcash_account_name || 'Barangay Pusok';
+    if (g('pay-qr-icon')) g('pay-qr-icon').innerHTML = `
+      <svg width="90" height="90" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
+        <rect width="110" height="38" rx="8" fill="#0076FE"/>
+        <circle cx="22" cy="19" r="13" fill="white"/>
+        <text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial,sans-serif">G</text>
+        <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">GCash</text>
+      </svg>`;
+    if (g('pay-info-text'))    g('pay-info-text').textContent    = 'Send via GCash Send Money';
+    if (g('pay-account-text')) g('pay-account-text').textContent = num;
   } else {
-    if (qrIcon)      qrIcon.innerHTML       = mayaQR();
-    if (infoText)    infoText.textContent    = 'Scan QR Code or send to the number below via Maya';
-    if (accountText) accountText.textContent = 'Maya Number: ' + mayaNumber;
+    const num  = settings.maya_number || '0998-765-4321';
+    const name = settings.maya_account_name || 'Barangay Pusok';
+    if (g('pay-qr-icon')) g('pay-qr-icon').innerHTML = `
+      <svg width="90" height="90" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="mg3" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00D26A"/><stop offset="100%" stop-color="#00AEEF"/>
+        </linearGradient></defs>
+        <rect width="110" height="38" rx="8" fill="url(#mg3)"/>
+        <polygon points="10,30 17,10 24,30 17,23" fill="white"/>
+        <polygon points="17,30 24,10 31,30 24,23" fill="white" opacity="0.6"/>
+        <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">maya</text>
+      </svg>`;
+    if (g('pay-info-text'))    g('pay-info-text').textContent    = 'Send via Maya Send Money';
+    if (g('pay-account-text')) g('pay-account-text').textContent = num;
   }
-}
-
-function gcashQR() {
-  return `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="100" fill="#0076FE"/>
-    <circle cx="50" cy="50" r="34" fill="white"/>
-    <text x="50" y="64" text-anchor="middle" font-size="40" font-weight="900"
-      fill="#0076FE" font-family="Arial Black,Arial,sans-serif">G</text>
-  </svg>`;
-}
-
-function mayaQR() {
-  return `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="mqr" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#00D26A"/>
-      <stop offset="100%" stop-color="#00AEEF"/>
-    </linearGradient></defs>
-    <rect width="100" height="100" fill="url(#mqr)"/>
-    <polygon points="20,80 36,25 52,80 36,65" fill="white" opacity="0.95"/>
-    <polygon points="36,80 52,25 68,80 52,65" fill="white" opacity="0.65"/>
-  </svg>`;
 }
 
 // ── SUBMIT REQUEST ────────────────────────────────────────
 async function submitRequest() {
-  if (!selectedDoc) { toast('Please select a document type.', 'error'); return; }
+  if (!selectedDocType) { toast('No document type selected.', 'error'); return; }
 
-  const name    = v('rf-name').trim();
-  const dob     = v('rf-dob').trim();
-  const phone   = v('rf-phone').trim();
-  const civil   = v('rf-civil');
-  const addr    = v('rf-addr').trim();
-  const purpose = v('rf-purpose').trim();
+  const fee    = parseFloat(selectedDocType.fee);
+  const isFree = fee === 0;
 
-  if (!name)    { toast('Full name is required.',         'error'); return; }
-  if (!dob)     { toast('Date of birth is required.',     'error'); return; }
-  if (!phone)   { toast('Contact number is required.',    'error'); return; }
-  if (!addr)    { toast('Home address is required.',      'error'); return; }
-  if (!purpose) { toast('Purpose / reason is required.', 'error'); return; }
-
-  const isFree = parseFloat(selectedDoc.fee) === 0;
-
+  // Validate payment for paid docs
   if (!isFree) {
-    if (!selectedPay) { toast('Please select GCash or Maya.', 'error'); return; }
-    const ref = v('pay-ref').trim();
-    if (!ref) { toast('Please enter your payment reference number.', 'error'); return; }
+    if (!selectedPayMethod) { toast('Please select a payment method.', 'error'); return; }
+    const payRef = v('pay-ref').trim();
+    if (!payRef) { toast('Please enter your payment reference number.', 'error'); return; }
   }
 
   const payload = {
-    doc_type_id:    selectedDoc.id,
-    full_name:      name,
-    date_of_birth:  dob,
-    phone,
-    civil_status:   civil,
-    address:        addr,
-    purpose,
-    payment_method: isFree ? 'FREE' : (selectedPay === 'gcash' ? 'GCash' : 'Maya'),
+    doc_type_id:    selectedDocType.id,
+    full_name:      v('rf-name').trim(),
+    date_of_birth:  v('rf-dob').trim(),
+    phone:          v('rf-phone').trim(),
+    civil_status:   v('rf-civil'),
+    address:        v('rf-addr').trim(),
+    purpose:        v('rf-purpose').trim(),
+    payment_method: isFree ? 'FREE' : (selectedPayMethod === 'gcash' ? 'GCash' : 'Maya'),
     payment_ref:    isFree ? 'FREE' : v('pay-ref').trim(),
   };
 
   const btn = g('btn-submit');
   if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
 
+  showLoader();
   const res = await POST('requests', 'submit', payload);
+  hideLoader();
 
   if (btn) { btn.disabled = false; btn.textContent = 'Submit Request ✓'; }
 
-  if (!res.success) { toast(res.message, 'error'); return; }
+  if (!res.success) { toast(res.message || 'Submission failed.', 'error'); return; }
 
   // Show success modal
   const refEl = g('success-ref');
@@ -275,19 +258,7 @@ async function submitRequest() {
   openModal('modal-success');
 
   // Reset form state
-  selectedDoc = null;
-  selectedPay = null;
-  currentStep = 1;
-  resetFormFields();
-}
-
-function resetFormFields() {
-  ['rf-name','rf-dob','rf-phone','rf-addr','rf-purpose','pay-ref'].forEach(id => {
-    const el = g(id); if (el) el.value = '';
-  });
-  document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('sel'));
-  document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('sel'));
-  const qrSec     = g('pay-qr-section');     if (qrSec)     qrSec.style.display     = 'none';
-  const freeMsg   = g('pay-free-msg');       if (freeMsg)   freeMsg.style.display   = 'none';
-  const payMethod = g('pay-method-section'); if (payMethod) payMethod.style.display = 'none';
+  selectedDocType   = null;
+  selectedPayMethod = null;
+  currentStep       = 1;
 }

@@ -18,10 +18,18 @@ async function api(file, action, method = 'GET', body = null) {
 
   try {
     const res  = await fetch(url, opts);
-    const data = await res.json();
-    return data;
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      // PHP returned HTML (fatal error) — log raw output so you can diagnose
+      console.error('=== PHP ERROR from ' + url + ' ===');
+      console.error(text);
+      toast('Server error — check the browser Console (F12) for details.', 'error');
+      return { success: false, message: 'Server error.' };
+    }
   } catch (err) {
-    console.error('API error:', err);
+    console.error('API network error:', err);
     return { success: false, message: 'Network error. Please try again.' };
   }
 }
@@ -30,7 +38,17 @@ async function api(file, action, method = 'GET', body = null) {
 const GET  = (file, action, params = {}) => {
   const qs = new URLSearchParams(params).toString();
   const url = `${API_BASE}/${file}.php?action=${action}${qs ? '&' + qs : ''}`;
-  return fetch(url, { credentials: 'include' }).then(r => r.json());
+  return fetch(url, { credentials: 'include' })
+    .then(r => r.text())
+    .then(text => {
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error('=== PHP ERROR from ' + url + ' ===');
+        console.error(text);
+        return { success: false, message: 'Server error.' };
+      }
+    });
 };
 const POST = (file, action, body) => api(file, action, 'POST', body);
 const PUT  = (file, action, body) => api(file, action, 'PUT',  body);
