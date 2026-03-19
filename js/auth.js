@@ -1,17 +1,17 @@
-// ============================================================
+// 
 //  js/auth.js  –  Login, Register, Logout, Session
-// ============================================================
+// 
 
 let currentUser = null;
 
-// ── PAGE SWITCHER ─────────────────────────────────────────
+// PAGE SWITCHER 
 function showPage(p) {
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   const pg = document.getElementById('page-' + p);
   if (pg) pg.classList.add('active');
 }
 
-// ── LOGIN ─────────────────────────────────────────────────
+//  LOGIN 
 async function doLogin() {
   const email = v('li-email').trim().toLowerCase();
   const pass  = v('li-pass');
@@ -28,7 +28,7 @@ async function doLogin() {
   applySession(res.user);
 }
 
-// ── REGISTER ──────────────────────────────────────────────
+// REGISTER 
 async function doRegister() {
   const payload = {
     first_name:       v('rg-fn').trim(),
@@ -59,7 +59,7 @@ async function doRegister() {
   setTimeout(() => showPage('login'), 1400);
 }
 
-// ── LOGOUT ────────────────────────────────────────────────
+// LOGOUT 
 async function doLogout() {
   await POST('auth', 'logout');
   currentUser = null;
@@ -69,7 +69,7 @@ async function doLogout() {
   toast('Signed out successfully.', 'info');
 }
 
-// ── DEMO LOGINS ───────────────────────────────────────────
+// DEMO LOGINS 
 function demoLogin(role) {
   if (role === 'admin') {
     g('li-email').value = 'admin@barangay.ph';
@@ -81,7 +81,7 @@ function demoLogin(role) {
   doLogin();
 }
 
-// ── APPLY SESSION ─────────────────────────────────────────
+// APPLY SESSION 
 function applySession(user) {
   currentUser = user;
 
@@ -107,7 +107,7 @@ function applySession(user) {
   toast('Welcome back, ' + user.first_name + '!', 'success');
 }
 
-// ── CHECK SESSION ON LOAD ─────────────────────────────────
+//  CHECK SESSION ON LOAD 
 async function checkSession() {
   const res = await GET('auth', 'me');
   if (res.success && res.user) {
@@ -116,7 +116,7 @@ async function checkSession() {
   // else stay on login page
 }
 
-// ── NOTIFICATION COUNT ────────────────────────────────────
+//  NOTIFICATION COUNT 
 async function loadNotifCount() {
   if (!currentUser) return;
   const res = await GET('users', 'notifications');
@@ -129,7 +129,7 @@ async function loadNotifCount() {
   }
 }
 
-// ── PREFILL PROFILE FORM ──────────────────────────────────
+//  PREFILL PROFILE FORM 
 function prefillProfile(user) {
   if (g('pf-fn')) g('pf-fn').value = user.first_name || '';
   if (g('pf-ln')) g('pf-ln').value = user.last_name  || '';
