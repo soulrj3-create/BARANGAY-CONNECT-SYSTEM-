@@ -585,15 +585,19 @@
             <div class="field"><label>Contact Number</label><input id="cfg-tel" type="text"/></div>
             <div class="card-title" style="margin-bottom:14px;margin-top:22px">💳 Payment Accounts</div>
             <div class="field"><label>GCash Number</label>
-              <div class="input-icon-wrap">
-                <input id="cfg-gcash" type="text" placeholder="09XX XXX XXXX"/>
-                <div class="input-icon"><svg width="26" height="14" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="6" fill="#0076FE"/><circle cx="22" cy="19" r="13" fill="white"/><text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial">G</text><text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial">GCash</text></svg></div>
+              <div style="position:relative;display:flex;align-items:center;">
+                <input id="cfg-gcash" type="text" placeholder="09XX XXX XXXX" style="padding-right:80px"/>
+                <div style="position:absolute;right:10px;pointer-events:none;display:flex;align-items:center;">
+                  <svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="6" fill="#0076FE"/><circle cx="22" cy="19" r="13" fill="white"/><text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial">G</text><text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial">GCash</text></svg>
+                </div>
               </div>
             </div>
             <div class="field"><label>Maya Number</label>
-              <div class="input-icon-wrap">
-                <input id="cfg-maya" type="text" placeholder="09XX XXX XXXX"/>
-                <div class="input-icon"><svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="7" fill="#00BFA5"/><text x="55" y="26" text-anchor="middle" font-size="18" font-weight="900" fill="white" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" letter-spacing="2">maya</text></svg></div>
+              <div style="position:relative;display:flex;align-items:center;">
+                <input id="cfg-maya" type="text" placeholder="09XX XXX XXXX" style="padding-right:80px"/>
+                <div style="position:absolute;right:10px;pointer-events:none;display:flex;align-items:center;">
+                  <svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="7" fill="#00BFA5"/><text x="55" y="26" text-anchor="middle" font-size="18" font-weight="900" fill="white" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" letter-spacing="2">maya</text></svg>
+                </div>
               </div>
             </div>
             <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>

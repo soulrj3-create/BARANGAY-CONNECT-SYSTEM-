@@ -354,7 +354,7 @@ async function viewRequest(id) {
         ${adminDetailRow('Purpose',    r.purpose)}
         ${adminDetailRow('Fee',        feeHtml)}
         ${adminDetailRow('Payment',    payBadge(r.payment_method))}
-        ${!isFree ? adminDetailRow('Contact Details', `<span style="font-family:monospace;font-weight:700">${r.payment_ref||'N/A'}</span>`) : ''}
+        ${!isFree ? adminDetailRow('Payment Ref #', `<span style="font-family:monospace;font-weight:700">${r.payment_ref||'N/A'}</span>`) : ''}
         ${adminDetailRow('Verified',   r.payment_verified ? '<span style="color:var(--success);font-weight:700">✅ Verified</span>' : '<span style="color:var(--warning);font-weight:700">⏳ Pending</span>')}
       </div>
     </div>`;
