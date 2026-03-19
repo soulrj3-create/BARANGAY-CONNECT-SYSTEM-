@@ -2,7 +2,9 @@
 //  js/api.js  –  API calls & shared utilities
 // ============================================================
 
-const API_BASE = './php';
+// FIX: PHP files are at the project root, not inside a php/ subfolder.
+// Change this to './php' only if you reorganize into subfolders.
+const API_BASE = '.';
 
 // ── Core fetch wrapper ────────────────────────────────────
 async function api(file, action, method = 'GET', body = null) {
