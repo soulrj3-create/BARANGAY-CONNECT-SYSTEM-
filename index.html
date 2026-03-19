@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BarangayConnect – Digital Barangay Services</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" class="page active auth-page">
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-logo">🏛️</div>
+      <h1>BarangayConnect</h1>
+      <p>Digital Barangay Document Services</p>
+    </div>
+    <div class="auth-card">
+      <h2>Welcome Back</h2>
+      <div class="sub">Sign in to your account</div>
+      <div class="field"><label>Email Address</label><input id="li-email" type="email" placeholder="yourname@email.com"/></div>
+      <div class="field"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••"/></div>
+      <button id="btn-login" class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+      <div class="divider">Quick Demo Access</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline btn-full" onclick="demoLogin('resident')">👤 Resident Demo</button>
+        <button class="btn btn-outline btn-full" onclick="demoLogin('admin')">🛡️ Admin Demo</button>
+      </div>
+    </div>
+    <div class="auth-footer">Don't have an account? <a onclick="showPage('register')">Register here</a></div>
+  </div>
+</div>
+
+<!-- REGISTER PAGE -->
+<div id="page-register" class="page auth-page">
+  <div class="auth-wrap" style="max-width:500px">
+    <div class="auth-brand">
+      <div class="auth-logo">🏛️</div>
+      <h1>BarangayConnect</h1>
+      <p>Create your resident account</p>
+    </div>
+    <div class="auth-card">
+      <h2>Create Account</h2>
+      <div class="sub">Register to request documents online</div>
+      <div class="row2">
+        <div class="field"><label>First Name <span class="req">*</span></label><input id="rg-fn" type="text" placeholder="Juan"/></div>
+        <div class="field"><label>Last Name <span class="req">*</span></label><input id="rg-ln" type="text" placeholder="dela Cruz"/></div>
+      </div>
+      <div class="field"><label>Email Address <span class="req">*</span></label><input id="rg-em" type="email" placeholder="juan@email.com"/></div>
+      <div class="row2">
+        <div class="field"><label>Mobile Number <span class="req">*</span></label><input id="rg-ph" type="text" placeholder="09XX XXX XXXX"/></div>
+        <div class="field"><label>Barangay <span class="req">*</span></label>
+          <select id="rg-pu"><option value="">Select Barangay</option><option>Pusok</option><option>Babag</option><option>Payo</option><option>Gun-ob</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Complete Address</label><input id="rg-ad" type="text" placeholder="House No., Street, Barangay"/></div>
+      <div class="row2">
+        <div class="field"><label>Password <span class="req">*</span></label><input id="rg-pw" type="password" placeholder="Min. 8 characters"/></div>
+        <div class="field"><label>Confirm Password <span class="req">*</span></label><input id="rg-cp" type="password" placeholder="Repeat password"/></div>
+      </div>
+      <button id="btn-register" class="btn btn-primary btn-full" onclick="doRegister()">Create Account →</button>
+    </div>
+    <div class="auth-footer">Already registered? <a onclick="showPage('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="page-app" class="page">
+  <nav class="topnav">
+    <div class="brand" onclick="goHome()">
+      <div class="brand-logo">🏛️</div>
+      <span class="brand-name">BarangayConnect</span>
+    </div>
+    <div class="topnav-right">
+      <div class="notif-btn">
+        <button class="btn btn-outline btn-sm" onclick="openNotifModal()">🔔</button>
+        <div class="notif-dot" id="notif-dot" style="display:none">0</div>
+      </div>
+      <div class="user-chip">
+        <div class="user-avatar" id="nav-av">J</div>
+        <span class="uname" id="nav-name">User</span>
+        <span class="role-badge" id="nav-role">Resident</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="app-body">
+    <aside class="sidebar">
+      <div id="res-nav">
+        <div class="sidebar-label">Resident Portal</div>
+        <button class="slink active" id="sl-res-home"    onclick="showPanel('res-home')"><span class="si">🏠</span> Dashboard</button>
+        <button class="slink"        id="sl-res-request" onclick="showPanel('res-request')"><span class="si">📄</span> Request Document</button>
+        <button class="slink"        id="sl-res-history" onclick="showPanel('res-history')"><span class="si">📋</span> My Requests</button>
+        <button class="slink"        id="sl-res-track"   onclick="showPanel('res-track')"><span class="si">🔍</span> Track Status</button>
+        <button class="slink"        id="sl-res-profile" onclick="showPanel('res-profile')"><span class="si">👤</span> My Profile</button>
+      </div>
+      <div id="adm-nav" style="display:none">
+        <div class="sidebar-label">Administration</div>
+        <button class="slink active" id="sl-adm-home"      onclick="showPanel('adm-home')"><span class="si">📊</span> Dashboard</button>
+        <button class="slink"        id="sl-adm-requests"  onclick="showPanel('adm-requests')"><span class="si">📥</span> All Requests</button>
+        <button class="slink"        id="sl-adm-residents" onclick="showPanel('adm-residents')"><span class="si">👥</span> Residents</button>
+        <button class="slink"        id="sl-adm-reports"   onclick="showPanel('adm-reports')"><span class="si">📈</span> Reports</button>
+        <button class="slink"        id="sl-adm-settings"  onclick="showPanel('adm-settings')"><span class="si">⚙️</span> Settings</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- RESIDENT: HOME -->
+      <div class="panel active" id="panel-res-home">
+        <div class="sec-head">
+          <div><div class="sec-title" id="greet-text">Good day! 👋</div><div class="sec-sub">Here's a summary of your requests</div></div>
+          <button class="btn btn-primary" onclick="showPanel('res-request')">+ New Request</button>
+        </div>
+        <div class="stat-grid" id="res-stats"></div>
+        <div id="res-alert-ready"></div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Recent Requests</div><button class="btn btn-outline btn-sm" onclick="showPanel('res-history')">View All</button></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Ref #</th><th>Document</th><th>Date</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="res-recent-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- RESIDENT: REQUEST -->
+      <div class="panel" id="panel-res-request">
+        <div class="sec-head"><div><div class="sec-title">Request a Document</div><div class="sec-sub">Submit your barangay document request online</div></div></div>
+        <div class="card">
+          <div class="steps-row">
+            <div class="step-item"><div class="step-num active" id="sn1">1</div><div class="step-connector" id="sc1"></div></div>
+            <div class="step-item"><div class="step-num" id="sn2">2</div><div class="step-connector" id="sc2"></div></div>
+            <div class="step-item"><div class="step-num" id="sn3">3</div></div>
+          </div>
+          <!-- Step 1 -->
+          <div id="req-s1">
+            <div class="card-title" style="margin-bottom:6px">Choose Document Type</div>
+            <p style="color:var(--muted2);font-size:13.5px;margin-bottom:18px">Select the document you need</p>
+            <div class="doc-grid" id="doc-type-grid"><div style="color:var(--muted);font-size:13.5px">Loading…</div></div>
+          </div>
+          <!-- Step 2 -->
+          <div id="req-s2" style="display:none">
+            <div class="card-title" style="margin-bottom:4px">Personal Details</div>
+            <div id="req-selected-doc"></div>
+            <div class="row2">
+              <div class="field"><label>Full Name <span class="req">*</span></label><input id="rf-name" type="text" placeholder="As it appears on valid ID"/></div>
+              <div class="field"><label>Date of Birth <span class="req">*</span></label><input id="rf-dob" type="date"/></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label>Contact Number <span class="req">*</span></label><input id="rf-phone" type="text" placeholder="09XX XXX XXXX"/></div>
+              <div class="field"><label>Civil Status</label><select id="rf-civil"><option>Single</option><option>Married</option><option>Widowed</option><option>Separated</option></select></div>
+            </div>
+            <div class="field"><label>Complete Home Address <span class="req">*</span></label><input id="rf-addr" type="text" placeholder="House No., Street, Purok"/></div>
+            <div class="field"><label>Purpose / Reason <span class="req">*</span></label><input id="rf-purpose" type="text" placeholder="e.g. Employment, Scholarship, Bank Loan…"/></div>
+            <div style="display:flex;gap:10px;margin-top:6px">
+              <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+              <button class="btn btn-primary" style="flex:1" onclick="goStep(3)">Continue to Payment →</button>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div id="req-s3" style="display:none">
+            <div class="card-title" style="margin-bottom:4px">Payment</div>
+            <p style="color:var(--muted2);font-size:13.5px;margin-bottom:14px">Choose your preferred payment method</p>
+            <div id="pay-fee-box"></div>
+            <div id="pay-free-msg" style="display:none"><div class="alert alert-success">✅ This document is <strong>free of charge</strong>. No payment needed — click Submit Request below.</div></div>
+            <div id="pay-method-section" style="display:none">
+              <div class="pay-grid">
+                <div class="pay-card" id="pc-gcash" onclick="selectPay('gcash')">
+                  <div class="pay-logo">
+                    <svg width="110" height="38" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="110" height="38" rx="8" fill="#0076FE"/>
+                      <circle cx="22" cy="19" r="13" fill="white"/>
+                      <text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial,sans-serif">G</text>
+                      <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">GCash</text>
+                    </svg>
+                  </div>
+                  <div class="pay-sub">Send Money · QR Ph</div>
+                </div>
+                <div class="pay-card" id="pc-maya" onclick="selectPay('maya')">
+                  <div class="pay-logo">
+                    <svg width="110" height="38" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
+                      <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D26A"/><stop offset="100%" stop-color="#00AEEF"/></linearGradient></defs>
+                      <rect width="110" height="38" rx="8" fill="url(#mg)"/>
+                      <polygon points="10,30 17,10 24,30 17,23" fill="white"/>
+                      <polygon points="17,30 24,10 31,30 24,23" fill="white" opacity="0.6"/>
+                      <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">maya</text>
+                    </svg>
+                  </div>
+                  <div class="pay-sub">Send Money · QR Ph</div>
+                </div>
+              </div>
+              <div id="pay-qr-section" style="display:none">
+                <div class="pay-qr-box">
+                  <div class="qr-icon" id="pay-qr-icon"></div>
+                  <div class="pay-amount" id="pay-amount-text">₱0.00</div>
+                  <div style="font-size:13px;color:var(--muted2);margin-bottom:10px" id="pay-info-text">Select a method above</div>
+                  <div style="background:var(--surface3);border-radius:9px;padding:12px;margin-bottom:14px">
+                    <div id="pay-account-text" style="font-size:13px;font-weight:600"></div>
+                    <div style="font-size:12px;color:var(--muted2);margin-top:3px">Account Name: Barangay Pusok</div>
+                  </div>
+                  <div class="field" style="text-align:left;margin-bottom:0">
+                    <label>Payment Reference Number <span class="req">*</span></label>
+                    <input id="pay-ref" type="text" placeholder="Enter GCash / Maya reference number"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+              <button id="btn-submit" class="btn btn-primary" style="flex:1" onclick="submitRequest()">Submit Request ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESIDENT: HISTORY -->
+      <div class="panel" id="panel-res-history">
+        <div class="sec-head"><div><div class="sec-title">My Requests</div><div class="sec-sub">All submitted document requests</div></div></div>
+        <div class="search-row"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search by reference number or document type…" id="hist-search"/></div>
+        <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Ref #</th><th>Document</th><th>Date</th><th>Purpose</th><th>Fee</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="hist-tb"></tbody></table></div></div>
+      </div>
+
+      <!-- RESIDENT: TRACK -->
+      <div class="panel" id="panel-res-track">
+        <div class="sec-head"><div><div class="sec-title">Track Request</div><div class="sec-sub">Enter your reference number to check status</div></div></div>
+        <div class="card" style="max-width:640px">
+          <div style="display:flex;gap:10px;margin-bottom:22px">
+            <input id="track-in" type="text" placeholder="e.g. REQ-2024-001" style="flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14.5px;outline:none;font-family:inherit"/>
+            <button class="btn btn-primary" onclick="doTrack()">Track</button>
+          </div>
+          <div id="track-result"><div class="empty-state"><div class="empty-icon">🔍</div><div>Enter a reference number above.</div></div></div>
+        </div>
+      </div>
+
+      <!-- RESIDENT: PROFILE -->
+      <div class="panel" id="panel-res-profile">
+        <div class="sec-head"><div><div class="sec-title">My Profile</div><div class="sec-sub">Manage your account information</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:18px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+              <div id="prof-av-big" style="width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff">J</div>
+              <div>
+                <div id="prof-name-disp" style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700">User</div>
+                <div id="prof-email-disp" style="color:var(--muted2);font-size:13.5px">email</div>
+                <div class="chip" style="margin-top:6px">👤 Resident</div>
+              </div>
+            </div>
+            <div class="card-title" style="margin-bottom:14px">Personal Information</div>
+            <div class="row2">
+              <div class="field"><label>First Name</label><input id="pf-fn" type="text"/></div>
+              <div class="field"><label>Last Name</label><input id="pf-ln" type="text"/></div>
+            </div>
+            <div class="field"><label>Email</label><input id="pf-em" type="email"/></div>
+            <div class="row2">
+              <div class="field"><label>Mobile</label><input id="pf-ph" type="text"/></div>
+              <div class="field"><label>Barangay</label><select id="pf-pu"><option>Pusok</option><option>Babag</option><option>Payo</option><option>Gun-ob</option></select></div>
+            </div>
+            <div class="field"><label>Address</label><input id="pf-ad" type="text"/></div>
+            <button id="btn-save-profile" class="btn btn-primary" style="max-width:200px" onclick="saveProfile()">Save Changes</button>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Change Password</div>
+            <div class="field"><label>Current Password</label><input id="pf-op" type="password" placeholder="Current password"/></div>
+            <div class="field"><label>New Password</label><input id="pf-np" type="password" placeholder="Minimum 8 characters"/></div>
+            <div class="field"><label>Confirm New Password</label><input id="pf-cp" type="password" placeholder="Repeat new password"/></div>
+            <button id="btn-save-pass" class="btn btn-outline" style="max-width:220px" onclick="savePassword()">Change Password</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN: HOME -->
+      <div class="panel" id="panel-adm-home">
+        <div class="sec-head">
+          <div><div class="sec-title">Admin Dashboard</div><div class="sec-sub">Barangay Pusok, Lapu-Lapu City</div></div>
+          <div class="chip" id="adm-date-chip">📅 …</div>
+        </div>
+        <div class="stat-grid" id="adm-stats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div class="card"><div class="card-title">Requests This Week</div><div class="bar-chart" id="week-chart"></div><div class="bar-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">Document Breakdown</div><div id="doc-breakdown"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Latest Requests</div><button class="btn btn-outline btn-sm" onclick="showPanel('adm-requests')">View All</button></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Ref #</th><th>Resident</th><th>Document</th><th>Date</th><th>Fee</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adm-recent-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: ALL REQUESTS -->
+      <div class="panel" id="panel-adm-requests">
+        <div class="sec-head"><div><div class="sec-title">All Requests</div><div class="sec-sub">Review and manage document requests</div></div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="btn btn-outline btn-sm adm-fil active" onclick="setFilter('all',this)">All</button>
+          <button class="btn btn-outline btn-sm adm-fil" onclick="setFilter('pending',this)">⏳ Pending</button>
+          <button class="btn btn-outline btn-sm adm-fil" onclick="setFilter('processing',this)">🔄 Processing</button>
+          <button class="btn btn-outline btn-sm adm-fil" onclick="setFilter('ready',this)">✅ Ready</button>
+          <button class="btn btn-outline btn-sm adm-fil" onclick="setFilter('completed',this)">🏁 Completed</button>
+          <button class="btn btn-outline btn-sm adm-fil" onclick="setFilter('rejected',this)">❌ Rejected</button>
+        </div>
+        <div class="search-row"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search by ref, resident name, or document…" id="adm-search"/></div>
+        <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Ref #</th><th>Resident</th><th>Document</th><th>Date</th><th>Fee</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adm-all-tb"></tbody></table></div></div>
+      </div>
+
+      <!-- ADMIN: RESIDENTS -->
+      <div class="panel" id="panel-adm-residents">
+        <div class="sec-head"><div><div class="sec-title">Registered Residents</div><div class="sec-sub">All residents with active accounts</div></div><div class="chip">👥 <span id="res-count">—</span> Total</div></div>
+        <div class="search-row"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search residents…" id="res-search"/></div>
+        <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Purok</th><th>Registered</th><th>Requests</th></tr></thead><tbody id="residents-tb"></tbody></table></div></div>
+      </div>
+
+      <!-- ADMIN: REPORTS -->
+      <div class="panel" id="panel-adm-reports">
+        <div class="sec-head">
+          <div><div class="sec-title">Reports</div><div class="sec-sub">Monthly summaries and analytics</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="rpt-month" onchange="renderReports()" style="background:var(--surface2);border:1.5px solid var(--border2);border-radius:9px;padding:8px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
+              <option value="12">December 2024</option><option value="11">November 2024</option><option value="10">October 2024</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="toast('Exported!','success')">⬇ Export</button>
+          </div>
+        </div>
+        <div class="report-grid" id="report-stats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card"><div class="card-title" style="margin-bottom:14px">By Document Type</div><div id="rpt-by-doc"></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">By Payment Method</div><div id="rpt-by-pay"></div></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: SETTINGS -->
+      <div class="panel" id="panel-adm-settings">
+        <div class="sec-head"><div><div class="sec-title">Settings</div><div class="sec-sub">Barangay info and document fees</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:18px">🏛️ Barangay Information</div>
+            <div class="field"><label>Barangay Name</label><input id="cfg-bgy" type="text" placeholder="e.g. Barangay Pusok"/></div>
+            <div class="row2"><div class="field"><label>Municipality</label><input id="cfg-mun" type="text" placeholder="Lapu-Lapu City"/></div><div class="field"><label>Province</label><input id="cfg-prov" type="text" placeholder="Cebu"/></div></div>
+            <div class="field"><label>Barangay Captain</label><input id="cfg-capt" type="text"/></div>
+            <div class="field"><label>Contact Number</label><input id="cfg-tel" type="text"/></div>
+            <div class="card-title" style="margin-bottom:14px;margin-top:22px">💳 Payment Accounts</div>
+            <div class="field"><label>GCash Number</label>
+              <div class="input-icon-wrap">
+                <input id="cfg-gcash" type="text" placeholder="09XX XXX XXXX"/>
+                <div class="input-icon"><svg width="26" height="14" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="6" fill="#0076FE"/><circle cx="22" cy="19" r="13" fill="white"/><text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial">G</text><text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial">GCash</text></svg></div>
+              </div>
+            </div>
+            <div class="field"><label>Maya Number</label>
+              <div class="input-icon-wrap">
+                <input id="cfg-maya" type="text" placeholder="09XX XXX XXXX"/>
+                <div class="input-icon"><svg width="26" height="14" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="mg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D26A"/><stop offset="100%" stop-color="#00AEEF"/></linearGradient></defs><rect width="110" height="38" rx="6" fill="url(#mg2)"/><polygon points="10,30 17,10 24,30 17,23" fill="white"/><polygon points="17,30 24,10 31,30 24,23" fill="white" opacity="0.6"/><text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial">maya</text></svg></div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:18px">📄 Document Fees (₱)</div>
+            <div id="fee-settings-list"><div style="color:var(--muted)">Loading…</div></div>
+            <button class="btn btn-primary" style="margin-top:14px" onclick="saveFees()">Save Fees</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-detail">
+  <div class="modal"><div class="modal-head"><h3>Request Details</h3><button class="x-btn" onclick="closeModal('modal-detail')">✕</button></div><div class="modal-body" id="modal-detail-body"></div><div class="modal-foot" id="modal-detail-foot"></div></div>
+</div>
+<div class="overlay" id="modal-success">
+  <div class="modal" style="max-width:420px;text-align:center"><div class="modal-body" style="padding:40px 32px">
+    <div style="font-size:60px;margin-bottom:16px">🎉</div>
+    <h3 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px">Request Submitted!</h3>
+    <p style="color:var(--muted2);font-size:13.5px;margin-bottom:22px">Your document request has been received. We'll notify you when it's ready.</p>
+    <div style="background:var(--surface2);border-radius:12px;padding:18px;margin-bottom:22px">
+      <div style="font-size:11px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Reference Number</div>
+      <div id="success-ref" style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--accent)"></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin-bottom:24px">Save this reference number to track your request.</p>
+    <button class="btn btn-primary btn-full" onclick="closeModal('modal-success');showPanel('res-home')">Back to Dashboard</button>
+  </div></div>
+</div>
+<div class="overlay" id="modal-notif">
+  <div class="modal" style="max-width:420px"><div class="modal-head"><h3>🔔 Notifications</h3><button class="x-btn" onclick="closeModal('modal-notif')">✕</button></div><div class="modal-body" id="notif-body"></div></div>
+</div>
+<div class="overlay" id="modal-reject">
+  <div class="modal" style="max-width:400px"><div class="modal-head"><h3>Reject Request</h3><button class="x-btn" onclick="closeModal('modal-reject')">✕</button></div>
+  <div class="modal-body"><p style="color:var(--muted2);font-size:13.5px;margin-bottom:16px">Provide a reason — the resident will be notified.</p><div class="field"><label>Rejection Reason <span class="req">*</span></label><textarea id="reject-reason" placeholder="e.g. Incomplete requirements, invalid address…"></textarea></div></div>
+  <div class="modal-foot"><button class="btn btn-outline btn-sm" onclick="closeModal('modal-reject')">Cancel</button><button class="btn btn-danger btn-sm" onclick="confirmReject()">Confirm Reject</button></div></div>
+</div>
+
+<div class="loader-overlay" id="loader"><div class="spinner"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/requests.js"></script>
+<script src="js/resident.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>
