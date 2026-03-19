@@ -36,7 +36,7 @@
     <div class="hero-text">
       <div class="hero-badge">
         <span class="hero-badge-dot"></span>
-        Barangay Lapu-Lapu City · Cebu
+        Barangay Pusok, Lapu-Lapu City · Cebu
       </div>
       <h1>Barangay Documents,<br><em>Done Online.</em></h1>
       <p>No more long queues at the barangay hall. Request your barangay clearance, certificates, and more — from your phone or computer, anytime.</p>
@@ -287,7 +287,7 @@
       <div class="row2">
         <div class="field"><label>Mobile Number <span class="req">*</span></label><input id="rg-ph" type="text" placeholder="09XX XXX XXXX"/></div>
         <div class="field"><label>Barangay <span class="req">*</span></label>
-          <select id="rg-pu"><option value="">Select Barangay</option><option>Pusok</option><option>Babag</option><option>Pajo</option><option>Gun-ob</option></select>
+          <select id="rg-pu"><option value="">Select Barangay</option><option>Pusok</option><option>Babag</option><option>Payo</option><option>Gun-ob</option></select>
         </div>
       </div>
       <div class="field"><label>Complete Address</label><input id="rg-ad" type="text" placeholder="House No., Street, Barangay"/></div>
@@ -485,6 +485,25 @@
               <div class="field"><label>Barangay</label><select id="pf-pu"><option>Pusok</option><option>Babag</option><option>Payo</option><option>Gun-ob</option></select></div>
             </div>
             <div class="field"><label>Address</label><input id="pf-ad" type="text"/></div>
+            <div style="border-top:1.5px solid var(--border);margin:18px 0 16px"></div>
+            <div class="card-title" style="margin-bottom:14px;font-size:14px">💳 Payment Account Numbers</div>
+            <div style="font-size:12.5px;color:var(--muted2);margin-bottom:14px">Add your GCash/Maya number so the admin can refund payments if your request is rejected.</div>
+            <div class="row2">
+              <div class="field">
+                <label>GCash Number</label>
+                <div class="input-icon-wrap">
+                  <input id="pf-gcash" type="text" placeholder="09XX XXX XXXX"/>
+                  <div class="input-icon"><svg width="26" height="14" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="6" fill="#0076FE"/><circle cx="22" cy="19" r="13" fill="white"/><text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial">G</text><text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial">GCash</text></svg></div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Maya Number</label>
+                <div class="input-icon-wrap">
+                  <input id="pf-maya" type="text" placeholder="09XX XXX XXXX"/>
+                  <div class="input-icon"><svg width="26" height="14" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="8" fill="#00BFA5"/><text x="55" y="26" text-anchor="middle" font-size="18" font-weight="900" fill="white" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" letter-spacing="2">maya</text></svg></div>
+                </div>
+              </div>
+            </div>
             <button id="btn-save-profile" class="btn btn-primary" style="max-width:200px" onclick="saveProfile()">Save Changes</button>
           </div>
           <div class="card">
