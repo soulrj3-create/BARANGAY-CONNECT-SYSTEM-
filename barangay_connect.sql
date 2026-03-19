@@ -105,14 +105,13 @@ CREATE TABLE IF NOT EXISTS settings (
 -- SEED DATA
 -- ============================================================
 
--- Admin user  (password: admin123)
+-- Admin user (password: admin123)
 INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, address, role) VALUES
-('Maria', 'Sta. Ana', 'admin@barangay.ph', '$2y$10$RybjA.VsxQoeJnYF2JF4x.MEM7./dOSk/uPO3mYgliE8bVtQXDmt6', '09171111111', 'Staff', 'Barangay Hall, Pusok', 'admin');
+('Maria', 'Sta. Ana', 'admin@barangay.ph', '$2y$10$7NG/zJDYcy13kaxc0mmMCeE8g4lkuXSFj9wIsC1VoCEDo06sq.k/m', '09171111111', 'Staff', 'Barangay Hall, Pusok', 'admin');
 
--- Resident users  (password: password123)
+-- Resident user (password: password123)
 INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, address, role) VALUES
-('Juan',  'dela Cruz', 'juan@email.com',  '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09171234567', 'Pusok',  '123 Sampaguita St., Pusok', 'resident'),
-
+('Eduard', 'dela Cruz', 'Eduard@email.com', '$2y$10$XW8srlLZSp.foGEaNyUKg.b7dCcyVB5Kvn3BtS2JGH/lQ5k7Xu6NC', '09171234567', 'Pusok', '123 Sampaguita St., Pusok', 'resident');
 
 -- Document types
 INSERT INTO document_types (name, icon, fee, processing_days, description) VALUES
@@ -123,21 +122,18 @@ INSERT INTO document_types (name, icon, fee, processing_days, description) VALUE
 ('Good Moral Certificate',   '⭐', 50.00,  1, 'Character reference for school or employment'),
 ('Cohabitation Certificate', '👫', 75.00,  1, 'Proof of living together as a couple');
 
--- Sample requests
+-- Sample requests (user_id=2 is Juan)
 INSERT INTO requests (reference_no, user_id, doc_type_id, full_name, date_of_birth, phone, civil_status, address, purpose, fee, payment_method, payment_ref, payment_verified, status) VALUES
-('REQ-2024-001', 2, 1, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'Employment',        50.00, 'GCash', 'GCX-456789', 1, 'completed'),
-('REQ-2024-002', 2, 3, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'Scholarship',        0.00, 'FREE',  'FREE',       1, 'completed'),
-('REQ-2024-003', 2, 1, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'Bank loan',         50.00, 'GCash', 'GCX-789012', 1, 'ready'),
-('REQ-2024-004', 2, 2, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'School enrollment', 50.00, 'Maya',  'MYA-321654', 1, 'pending'),
+('REQ-2024-001', 2, 1, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Employment',       50.00, 'GCash', 'GCX-456789', 1, 'completed'),
+('REQ-2024-002', 2, 3, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Scholarship',       0.00, 'FREE',  'FREE',       1, 'completed'),
+('REQ-2024-003', 2, 1, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Bank loan',        50.00, 'GCash', 'GCX-789012', 1, 'ready'),
+('REQ-2024-004', 2, 2, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'School enrollment',50.00, 'Maya',  'MYA-321654', 1, 'pending');
 
-
-UPDATE requests SET reject_reason = 'Invalid home address provided. Please update your profile and resubmit.' WHERE reference_no = 'REQ-2024-008';
-
--- Sample notifications for juan (user_id=2)
+-- Sample notifications for Juan (user_id=2)
 INSERT INTO notifications (user_id, title, message, icon, is_read) VALUES
-(2, 'Document Ready',      'Your Barangay Clearance (REQ-2024-003) is ready to claim at the barangay hall.', '✅', 0),
-(2, 'Request Processing',  'Your Certificate of Residency (REQ-2024-004) is now being processed.',           '🔄', 0),
-(2, 'Reminder',            'Please bring a valid government-issued ID when claiming your document.',          'ℹ️', 1);
+(2, 'Document Ready',     'Your Barangay Clearance (REQ-2024-003) is ready to claim at the barangay hall.', '✅', 0),
+(2, 'Request Processing', 'Your Certificate of Residency (REQ-2024-004) is now being processed.',           '🔄', 0),
+(2, 'Reminder',           'Please bring a valid government-issued ID when claiming your document.',          'ℹ️', 1);
 
 -- System settings
 INSERT INTO settings (setting_key, setting_val) VALUES
