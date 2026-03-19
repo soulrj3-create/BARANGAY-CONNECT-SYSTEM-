@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS document_types (
     fee             DECIMAL(10,2)    NOT NULL DEFAULT 0.00,
     processing_days TINYINT UNSIGNED NOT NULL DEFAULT 1,
     description     VARCHAR(255)     DEFAULT NULL,
+    urgent_fee      DECIMAL(10,2)    NOT NULL DEFAULT 50.00,
     is_active       TINYINT(1)       NOT NULL DEFAULT 1,
     created_at      TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -60,6 +61,8 @@ CREATE TABLE IF NOT EXISTS requests (
     address          TEXT            NOT NULL,
     purpose          VARCHAR(255)    NOT NULL,
     fee              DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+    processing_type  ENUM('normal','urgent') NOT NULL DEFAULT 'normal',
+    urgent_fee       DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
     payment_method   ENUM('GCash','Maya','FREE') NOT NULL DEFAULT 'FREE',
     payment_ref      VARCHAR(100)    DEFAULT NULL,
     payment_verified TINYINT(1)      NOT NULL DEFAULT 0,
@@ -116,13 +119,13 @@ INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, ad
 ('Eduard', 'dela Cruz', 'Eduard@email.com', '$2y$10$Lp4xKDWo3JNgJlOGY4b0Duhzv1HbhTkzAAqjrEB7gNaCpwhx1qEbq', '09171234567', 'Pusok', '123 Sampaguita St., Pusok', 'resident');
 
 -- Document types
-INSERT INTO document_types (name, icon, fee, processing_days, description) VALUES
-('Barangay Clearance',       '📋',  50.00, 1, 'For employment, travel, or general purposes'),
-('Certificate of Residency', '🏠',  50.00, 1, 'Proof that you reside in the barangay'),
-('Indigency Certificate',    '📜',   0.00, 1, 'For financial assistance or scholarship'),
-('Business Clearance',       '🏪', 150.00, 2, 'For opening or renewing a business permit'),
-('Good Moral Certificate',   '⭐',  50.00, 1, 'Character reference for school or employment'),
-('Cohabitation Certificate', '👫',  75.00, 1, 'Proof of living together as a couple');
+INSERT INTO document_types (name, icon, fee, urgent_fee, processing_days, description) VALUES
+('Barangay Clearance',       '📋',  50.00, 100.00, 1, 'For employment, travel, or general purposes'),
+('Certificate of Residency', '🏠',  50.00, 100.00, 1, 'Proof that you reside in the barangay'),
+('Indigency Certificate',    '📜',   0.00,  50.00, 1, 'For financial assistance or scholarship'),
+('Business Clearance',       '🏪', 150.00, 250.00, 2, 'For opening or renewing a business permit'),
+('Good Moral Certificate',   '⭐',  50.00, 100.00, 1, 'Character reference for school or employment'),
+('Cohabitation Certificate', '👫',  75.00, 125.00, 1, 'Proof of living together as a couple');
 
 -- Sample requests (user_id=2 is Eduard dela Cruz)
 INSERT INTO requests (reference_no, user_id, doc_type_id, full_name, date_of_birth, phone, civil_status, address, purpose, fee, payment_method, payment_ref, payment_verified, status) VALUES

@@ -2,15 +2,17 @@
 //  js/requests.js  –  Request Form (3-step wizard)
 // ============================================================
 
-let selectedDocType   = null;
-let currentStep       = 1;
-let selectedPayMethod = null;
+let selectedDocType      = null;
+let currentStep          = 1;
+let selectedPayMethod    = null;
+let selectedProcessingType = 'normal'; // 'normal' or 'urgent'
 
 // ── INIT REQUEST FORM ─────────────────────────────────────
 async function initRequestForm() {
-  selectedDocType   = null;
-  selectedPayMethod = null;
-  currentStep       = 1;
+  selectedDocType        = null;
+  selectedPayMethod      = null;
+  selectedProcessingType = 'normal';
+  currentStep            = 1;
 
   // Reset steps UI
   goStepUI(1);
@@ -84,7 +86,27 @@ function selectDocType(id) {
   btn.style.display = 'flex';
 }
 
-// ── STEP NAVIGATION ───────────────────────────────────────
+// ── SELECT PROCESSING TYPE ────────────────────────────────
+function selectProcessingType(type) {
+  selectedProcessingType = type;
+
+  const normal = document.getElementById('proc-normal');
+  const urgent = document.getElementById('proc-urgent');
+  const dt     = selectedDocType;
+  if (!normal || !urgent || !dt) return;
+
+  if (type === 'normal') {
+    normal.style.border     = '2px solid var(--accent)';
+    normal.style.background = 'var(--accent-lt)';
+    urgent.style.border     = '2px solid var(--border)';
+    urgent.style.background = 'var(--white)';
+  } else {
+    urgent.style.border     = '2px solid var(--warning)';
+    urgent.style.background = '#fefce8';
+    normal.style.border     = '2px solid var(--border)';
+    normal.style.background = 'var(--white)';
+  }
+}
 function goStep(step) {
   if (step > currentStep) {
     if (!validateStep(currentStep)) return;
@@ -135,17 +157,43 @@ function goStepUI(step) {
     if (sc) sc.classList.toggle('done', step > i);
   }
 
-  // Step 2: show selected doc summary banner
+  // Step 2: show selected doc summary banner + processing type selector
   if (step === 2 && selectedDocType) {
     const box = document.getElementById('req-selected-doc');
+    const dt  = selectedDocType;
+    const urgentFee = parseFloat(dt.urgent_fee || 50);
     if (box) {
-      box.innerHTML = `<div class="alert alert-success" style="margin-bottom:14px">
-        ${selectedDocType.icon} <strong>${selectedDocType.name}</strong> —
-        ${parseFloat(selectedDocType.fee) === 0
-          ? '<strong>FREE</strong>'
-          : '₱' + parseFloat(selectedDocType.fee).toFixed(2)}
-        · ${selectedDocType.processing_days} day processing
-      </div>`;
+      box.innerHTML = `
+        <div class="alert alert-success" style="margin-bottom:14px">
+          ${dt.icon} <strong>${dt.name}</strong> —
+          ${parseFloat(dt.fee) === 0 ? '<strong>FREE</strong>' : '₱' + parseFloat(dt.fee).toFixed(2)}
+          · ${dt.processing_days} day processing
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">
+            Processing Type <span style="color:var(--danger)">*</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="proc-card sel" id="proc-normal" onclick="selectProcessingType('normal')" style="border:2px solid var(--accent);border-radius:13px;padding:16px 14px;cursor:pointer;transition:.18s;background:var(--accent-lt);">
+              <div style="font-size:24px;margin-bottom:6px">📋</div>
+              <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Normal</div>
+              <div style="font-size:12px;color:var(--muted2);margin-top:3px">${dt.processing_days} day${dt.processing_days > 1 ? 's' : ''} processing</div>
+              <div style="font-size:13px;font-weight:700;color:var(--accent2);margin-top:6px">
+                ${parseFloat(dt.fee) === 0 ? '🆓 FREE' : '₱' + parseFloat(dt.fee).toFixed(2)}
+              </div>
+            </div>
+            <div class="proc-card" id="proc-urgent" onclick="selectProcessingType('urgent')" style="border:2px solid var(--border);border-radius:13px;padding:16px 14px;cursor:pointer;transition:.18s;background:var(--white);">
+              <div style="font-size:24px;margin-bottom:6px">⚡</div>
+              <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Urgent</div>
+              <div style="font-size:12px;color:var(--muted2);margin-top:3px">Same-day / priority</div>
+              <div style="font-size:13px;font-weight:700;color:var(--warning);margin-top:6px">
+                ${parseFloat(dt.fee) === 0
+                  ? '₱' + urgentFee.toFixed(2) + ' <span style="font-weight:400;color:var(--muted)">(urgent fee)</span>'
+                  : '₱' + (parseFloat(dt.fee) + urgentFee).toFixed(2) + ' <span style="font-weight:400;color:var(--muted);font-size:11px">(+₱' + urgentFee.toFixed(2) + ' urgent)</span>'}
+              </div>
+            </div>
+          </div>
+        </div>`;
     }
   }
 
@@ -158,15 +206,21 @@ function goStepUI(step) {
 async function buildPaymentUI() {
   if (!selectedDocType) return;
 
-  const fee    = parseFloat(selectedDocType.fee);
-  const isFree = fee === 0;
+  const baseFee   = parseFloat(selectedDocType.fee);
+  const urgentFee = selectedProcessingType === 'urgent' ? parseFloat(selectedDocType.urgent_fee || 50) : 0;
+  const fee       = baseFee + urgentFee;
+  const isFree    = fee === 0;
 
   // Fee display box
   const feeBox = document.getElementById('pay-fee-box');
   if (feeBox) {
     feeBox.innerHTML = `<div class="alert alert-info" style="margin-bottom:14px">
       ${selectedDocType.icon} <strong>${selectedDocType.name}</strong> —
-      Fee: <strong style="color:var(--accent)">${isFree ? 'FREE' : '₱' + fee.toFixed(2)}</strong>
+      ${selectedProcessingType === 'urgent'
+        ? `⚡ <strong style="color:var(--warning)">Urgent Processing</strong> &nbsp;·&nbsp;
+           Base: ₱${baseFee.toFixed(2)} + Urgent: ₱${urgentFee.toFixed(2)} = `
+        : '📋 Normal Processing &nbsp;·&nbsp; Fee: '}
+      <strong style="color:var(--accent)">${isFree ? 'FREE' : '₱' + fee.toFixed(2)}</strong>
     </div>`;
   }
 
@@ -200,8 +254,10 @@ function selectPay(method) {
   const qrSec = document.getElementById('pay-qr-section');
   if (qrSec) qrSec.style.display = 'block';
 
-  const settings = window._paySettings || {};
-  const fee      = parseFloat(selectedDocType?.fee || 0);
+  const settings  = window._paySettings || {};
+  const baseFee   = parseFloat(selectedDocType?.fee || 0);
+  const urgentFee = selectedProcessingType === 'urgent' ? parseFloat(selectedDocType?.urgent_fee || 50) : 0;
+  const fee       = baseFee + urgentFee;
 
   const amtEl = document.getElementById('pay-amount-text');
   if (amtEl) amtEl.textContent = '₱' + fee.toFixed(2);
@@ -237,8 +293,10 @@ function selectPay(method) {
 async function submitRequest() {
   if (!selectedDocType) { toast('No document type selected.', 'error'); return; }
 
-  const fee    = parseFloat(selectedDocType.fee);
-  const isFree = fee === 0;
+  const baseFee   = parseFloat(selectedDocType.fee);
+  const urgentFee = selectedProcessingType === 'urgent' ? parseFloat(selectedDocType.urgent_fee || 50) : 0;
+  const fee       = baseFee + urgentFee;
+  const isFree    = fee === 0;
 
   if (!isFree) {
     if (!selectedPayMethod) {
@@ -251,15 +309,16 @@ async function submitRequest() {
   }
 
   const payload = {
-    doc_type_id:    selectedDocType.id,
-    full_name:      (document.getElementById('rf-name')    || {value:''}).value.trim(),
-    date_of_birth:  (document.getElementById('rf-dob')     || {value:''}).value.trim(),
-    phone:          (document.getElementById('rf-phone')   || {value:''}).value.trim(),
-    civil_status:   (document.getElementById('rf-civil')   || {value:'Single'}).value,
-    address:        (document.getElementById('rf-addr')    || {value:''}).value.trim(),
-    purpose:        (document.getElementById('rf-purpose') || {value:''}).value.trim(),
-    payment_method: isFree ? 'FREE' : (selectedPayMethod === 'gcash' ? 'GCash' : 'Maya'),
-    payment_ref:    isFree ? 'FREE' : (document.getElementById('pay-ref') || {value:''}).value.trim(),
+    doc_type_id:     selectedDocType.id,
+    full_name:       (document.getElementById('rf-name')    || {value:''}).value.trim(),
+    date_of_birth:   (document.getElementById('rf-dob')     || {value:''}).value.trim(),
+    phone:           (document.getElementById('rf-phone')   || {value:''}).value.trim(),
+    civil_status:    (document.getElementById('rf-civil')   || {value:'Single'}).value,
+    address:         (document.getElementById('rf-addr')    || {value:''}).value.trim(),
+    purpose:         (document.getElementById('rf-purpose') || {value:''}).value.trim(),
+    processing_type: selectedProcessingType,
+    payment_method:  isFree ? 'FREE' : (selectedPayMethod === 'gcash' ? 'GCash' : 'Maya'),
+    payment_ref:     isFree ? 'FREE' : (document.getElementById('pay-ref') || {value:''}).value.trim(),
   };
 
   const btn = document.getElementById('btn-submit');
@@ -279,7 +338,8 @@ async function submitRequest() {
   openModal('modal-success');
 
   // Reset form for next use
-  selectedDocType   = null;
-  selectedPayMethod = null;
-  currentStep       = 1;
+  selectedDocType        = null;
+  selectedPayMethod      = null;
+  selectedProcessingType = 'normal';
+  currentStep            = 1;
 }

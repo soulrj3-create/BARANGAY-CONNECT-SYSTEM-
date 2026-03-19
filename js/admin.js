@@ -99,7 +99,14 @@ function admRow(r, showActions = false) {
     <td><span style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);cursor:pointer"
       onclick="viewRequest(${r.id})">${r.reference_no}</span></td>
     <td style="font-weight:500">${r.resident_name || r.full_name}</td>
-    <td>${r.doc_name}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        ${r.doc_name}
+        ${r.processing_type === 'urgent'
+          ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#fef9c3;color:#a16207;border:1px solid #fde68a;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">⚡ Urgent</span>`
+          : `<span style="display:inline-flex;align-items:center;gap:3px;background:var(--surface3);color:var(--muted2);border:1px solid var(--border);border-radius:99px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap">📋 Normal</span>`}
+      </div>
+    </td>
     <td style="color:var(--muted2)">${r.date}</td>
     <td>${fmt(r.fee)}</td>
     <td>${payBadge(r.payment_method)}</td>

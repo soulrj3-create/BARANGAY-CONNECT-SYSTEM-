@@ -54,7 +54,8 @@ function handleList(): void {
 
     $sql = "
         SELECT
-            r.id, r.reference_no, r.status, r.fee, r.payment_method, r.payment_ref,
+            r.id, r.reference_no, r.status, r.fee, r.processing_type, r.urgent_fee,
+            r.payment_method, r.payment_ref,
             r.payment_verified, r.purpose, r.reject_reason,
             DATE_FORMAT(r.created_at, '%Y-%m-%d') AS date,
             CONCAT(u.first_name, ' ', u.last_name) AS resident_name,
@@ -111,15 +112,18 @@ function handleSubmit(): void {
     $user = requireAuth('resident');
     $d    = getJson();
 
-    $docTypeId  = (int)($d['doc_type_id'] ?? 0);
-    $fullName   = clean($d['full_name']   ?? '');
-    $dob        = clean($d['date_of_birth'] ?? '');
-    $phone      = clean($d['phone']       ?? '');
-    $civil      = clean($d['civil_status'] ?? 'Single');
-    $address    = clean($d['address']     ?? '');
-    $purpose    = clean($d['purpose']     ?? '');
-    $payMethod  = clean($d['payment_method'] ?? '');
-    $payRef     = clean($d['payment_ref'] ?? '');
+    $docTypeId      = (int)($d['doc_type_id'] ?? 0);
+    $fullName       = clean($d['full_name']   ?? '');
+    $dob            = clean($d['date_of_birth'] ?? '');
+    $phone          = clean($d['phone']       ?? '');
+    $civil          = clean($d['civil_status'] ?? 'Single');
+    $address        = clean($d['address']     ?? '');
+    $purpose        = clean($d['purpose']     ?? '');
+    $payMethod      = clean($d['payment_method'] ?? '');
+    $payRef         = clean($d['payment_ref'] ?? '');
+    $processingType = clean($d['processing_type'] ?? 'normal');
+
+    if (!in_array($processingType, ['normal', 'urgent'])) $processingType = 'normal';
 
     // Validations
     if (!$docTypeId) jsonError('Document type is required.');
@@ -137,7 +141,11 @@ function handleSubmit(): void {
     $dt = $dtStmt->fetch();
     if (!$dt) jsonError('Invalid document type.');
 
-    $isFree = (float)$dt['fee'] == 0;
+    // Calculate total fee
+    $baseFee   = (float)$dt['fee'];
+    $urgentFee = ($processingType === 'urgent') ? (float)$dt['urgent_fee'] : 0.00;
+    $totalFee  = $baseFee + $urgentFee;
+    $isFree    = $totalFee == 0;
 
     // Payment validations for paid docs
     if (!$isFree) {
@@ -157,16 +165,20 @@ function handleSubmit(): void {
     $stmt = $pdo->prepare("
         INSERT INTO requests
             (reference_no, user_id, doc_type_id, full_name, date_of_birth, phone,
-             civil_status, address, purpose, fee, payment_method, payment_ref, payment_verified, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+             civil_status, address, purpose, fee, processing_type, urgent_fee,
+             payment_method, payment_ref, payment_verified, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
     $stmt->execute([
         $refNo, $user['id'], $docTypeId, $fullName, $dob, $phone,
-        $civil, $address, $purpose, $dt['fee'], $payMethod, $payRef,
-        $isFree ? 1 : 0   // free docs auto-verified
+        $civil, $address, $purpose, $totalFee, $processingType, $urgentFee,
+        $payMethod, $payRef,
+        $isFree ? 1 : 0
     ]);
 
     $newId = $pdo->lastInsertId();
+
+    $processingLabel = $processingType === 'urgent' ? 'Urgent Processing' : 'Normal Processing';
 
     // Auto-notification
     $pdo->prepare("
@@ -174,7 +186,7 @@ function handleSubmit(): void {
         VALUES (?, 'Request Submitted', ?, '📄')
     ")->execute([
         $user['id'],
-        "Your request for {$dt['name']} ({$refNo}) has been received. We'll notify you once it's processed."
+        "Your {$processingLabel} request for {$dt['name']} ({$refNo}) has been received. We'll notify you once it's processed."
     ]);
 
     jsonOk(['reference_no' => $refNo, 'request_id' => $newId], 'Request submitted successfully.');
@@ -247,6 +259,6 @@ function handleTrack(): void {
 // ── DOCUMENT TYPES ────────────────────────────────────────
 function handleDocTypes(): void {
     $pdo  = getDB();
-    $stmt = $pdo->query("SELECT * FROM document_types WHERE is_active = 1 ORDER BY id");
+    $stmt = $pdo->query("SELECT id, name, icon, fee, urgent_fee, processing_days, description FROM document_types WHERE is_active = 1 ORDER BY id");
     jsonOk(['doc_types' => $stmt->fetchAll()]);
 }

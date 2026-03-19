@@ -140,3 +140,10 @@ function todayFormatted() {
 function emptyRow(cols, message = 'No records found.') {
   return `<tr><td colspan="${cols}" style="text-align:center;padding:32px 20px;color:var(--muted)">${message}</td></tr>`;
 }
+// ── Processing type badge ─────────────────────────────────
+function processingBadge(type) {
+  if (type === 'urgent') {
+    return `<span class="badge" style="background:#fef9c3;color:#a16207">⚡ Urgent</span>`;
+  }
+  return `<span class="badge" style="background:var(--surface3);color:var(--muted2)">📋 Normal</span>`;
+}

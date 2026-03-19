@@ -349,11 +349,12 @@ async function viewRequest(id) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
         ${adminDetailRow('Document',   `${r.doc_icon||'📄'} <strong>${r.doc_name}</strong>`)}
         ${adminDetailRow('Reference #',`<span style="font-family:'Sora',sans-serif;font-weight:800;color:var(--accent)">${r.reference_no}</span>`)}
+        ${adminDetailRow('Processing', processingBadge(r.processing_type || 'normal'))}
         ${adminDetailRow('Date Filed', r.date || (r.created_at||'').slice(0,10))}
         ${adminDetailRow('Purpose',    r.purpose)}
         ${adminDetailRow('Fee',        feeHtml)}
         ${adminDetailRow('Payment',    payBadge(r.payment_method))}
-        ${!isFree ? adminDetailRow('Payment Ref #', `<span style="font-family:monospace;font-weight:700">${r.payment_ref||'N/A'}</span>`) : ''}
+        ${!isFree ? adminDetailRow('Contact Details', `<span style="font-family:monospace;font-weight:700">${r.payment_ref||'N/A'}</span>`) : ''}
         ${adminDetailRow('Verified',   r.payment_verified ? '<span style="color:var(--success);font-weight:700">✅ Verified</span>' : '<span style="color:var(--warning);font-weight:700">⏳ Pending</span>')}
       </div>
     </div>`;
