@@ -129,10 +129,7 @@ INSERT INTO requests (reference_no, user_id, doc_type_id, full_name, date_of_bir
 ('REQ-2024-002', 2, 3, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'Scholarship',        0.00, 'FREE',  'FREE',       1, 'completed'),
 ('REQ-2024-003', 2, 1, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'Bank loan',         50.00, 'GCash', 'GCX-789012', 1, 'ready'),
 ('REQ-2024-004', 2, 2, 'Juan dela Cruz', '1995-03-15', '09171234567', 'Single',  '123 Sampaguita St., Pusok', 'School enrollment', 50.00, 'Maya',  'MYA-321654', 1, 'pending'),
-('REQ-2024-005', 3, 4, 'Maria Santos',   '1990-07-22', '09281234567', 'Married', '45 Mabini St., Babag',       'Business permit',  150.00, 'GCash', 'GCX-111222', 1, 'processing'),
-('REQ-2024-006', 4, 5, 'Pedro Reyes',    '1988-11-10', '09091234567', 'Single',  '88 Rizal Ave., Payo',        'Employment',        50.00, 'GCash', 'GCX-333444', 1, 'pending'),
-('REQ-2024-007', 5, 1, 'Ana Gomez',      '1997-05-30', '09451234567', 'Single',  '12 Quezon St., Gun-ob',      'Travel',            50.00, 'Maya',  'MYA-555666', 1, 'ready'),
-('REQ-2024-008', 6, 6, 'Carlo Tan',      '1993-09-18', '09321234567', 'Married', '67 Magsaysay St., Pusok',    'Bank application',  75.00, 'GCash', 'GCX-777888', 0, 'rejected');
+
 
 UPDATE requests SET reject_reason = 'Invalid home address provided. Please update your profile and resubmit.' WHERE reference_no = 'REQ-2024-008';
 
