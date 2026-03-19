@@ -262,11 +262,7 @@
       <div class="field"><label>Email Address</label><input id="li-email" type="email" placeholder="yourname@email.com"/></div>
       <div class="field"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••"/></div>
       <button id="btn-login" class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
-      <div class="divider">Quick Demo Access</div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-outline btn-full" onclick="demoLogin('resident')">👤 Resident Demo</button>
-        <button class="btn btn-outline btn-full" onclick="demoLogin('admin')">🛡️ Admin Demo</button>
-      </div>
+
     </div>
     <div class="auth-footer">Don't have an account? <a onclick="showPage('register')">Register here</a></div>
   </div>
@@ -597,7 +593,7 @@
 
 <!-- MODALS -->
 <div class="overlay" id="modal-detail">
-  <div class="modal"><div class="modal-head"><h3>Request Details</h3><button class="x-btn" onclick="closeModal('modal-detail')">✕</button></div><div class="modal-body" id="modal-detail-body"></div><div class="modal-foot" id="modal-detail-foot"></div></div>
+  <div class="modal" style="max-width:640px"><div class="modal-head"><h3>Request Details</h3><button class="x-btn" onclick="closeModal('modal-detail')">✕</button></div><div class="modal-body" id="modal-detail-body"></div><div class="modal-foot" id="modal-detail-foot"></div></div>
 </div>
 <div class="overlay" id="modal-success">
   <div class="modal" style="max-width:420px;text-align:center"><div class="modal-body" style="padding:40px 32px">
