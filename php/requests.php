@@ -85,7 +85,9 @@ function handleGet(): void {
                u.email AS resident_email,
                u.phone AS resident_phone,
                u.address AS resident_address,
-               u.purok AS resident_purok
+               u.purok AS resident_purok,
+               u.gcash_number AS resident_gcash,
+               u.maya_number AS resident_maya
         FROM requests r
         JOIN document_types dt ON dt.id = r.doc_type_id
         JOIN users u ON u.id = r.user_id

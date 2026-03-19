@@ -29,7 +29,7 @@ function handleProfile() {
     $user = requireAuth();
     $pdo  = getDB();
     $stmt = $pdo->prepare("
-        SELECT id, first_name, last_name, email, phone, purok, address, role, created_at
+        SELECT id, first_name, last_name, email, phone, purok, address, role, gcash_number, maya_number, created_at
         FROM users WHERE id = ? LIMIT 1
     ");
     $stmt->execute([$user['id']]);
@@ -43,12 +43,14 @@ function handleUpdateProfile() {
     $user = requireAuth();
     $d    = getJson();
 
-    $first   = clean($d['first_name'] ?? '');
-    $last    = clean($d['last_name']  ?? '');
-    $phone   = clean($d['phone']      ?? '');
-    $purok   = clean($d['purok']      ?? '');
-    $address = clean($d['address']    ?? '');
+    $first   = clean($d['first_name']    ?? '');
+    $last    = clean($d['last_name']     ?? '');
+    $phone   = clean($d['phone']         ?? '');
+    $purok   = clean($d['purok']         ?? '');
+    $address = clean($d['address']       ?? '');
     $email   = strtolower(clean($d['email'] ?? ''));
+    $gcash   = clean($d['gcash_number']  ?? '');
+    $maya    = clean($d['maya_number']   ?? '');
 
     if (!$first || !$last)  jsonError('Name is required.');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) jsonError('Invalid email.');
@@ -61,18 +63,21 @@ function handleUpdateProfile() {
     if ($chk->fetch()) jsonError('Email is already in use by another account.');
 
     $pdo->prepare("
-        UPDATE users SET first_name=?, last_name=?, email=?, phone=?, purok=?, address=?, updated_at=NOW()
+        UPDATE users SET first_name=?, last_name=?, email=?, phone=?, purok=?, address=?,
+                         gcash_number=?, maya_number=?, updated_at=NOW()
         WHERE id=?
-    ")->execute([$first, $last, $email, $phone, $purok, $address, $user['id']]);
+    ")->execute([$first, $last, $email, $phone, $purok, $address, $gcash, $maya, $user['id']]);
 
     // Refresh session
-    $_SESSION['user']['first_name'] = $first;
-    $_SESSION['user']['last_name']  = $last;
-    $_SESSION['user']['name']       = $first . ' ' . $last;
-    $_SESSION['user']['email']      = $email;
-    $_SESSION['user']['phone']      = $phone;
-    $_SESSION['user']['purok']      = $purok;
-    $_SESSION['user']['address']    = $address;
+    $_SESSION['user']['first_name']   = $first;
+    $_SESSION['user']['last_name']    = $last;
+    $_SESSION['user']['name']         = $first . ' ' . $last;
+    $_SESSION['user']['email']        = $email;
+    $_SESSION['user']['phone']        = $phone;
+    $_SESSION['user']['purok']        = $purok;
+    $_SESSION['user']['address']      = $address;
+    $_SESSION['user']['gcash_number'] = $gcash;
+    $_SESSION['user']['maya_number']  = $maya;
 
     jsonOk(['user' => $_SESSION['user']], 'Profile updated successfully.');
 }
