@@ -6,11 +6,250 @@
 <title>BarangayConnect – Digital Barangay Services</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
+
+<style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
 
+<!-- LANDING PAGE -->
+<div id="page-landing" class="page active">
+
+  <!-- NAV -->
+  <nav class="land-nav">
+    <a class="land-brand" onclick="showPage('landing')">
+      <div class="land-logo">🏛️</div>
+      <span class="land-brand-txt">BarangayConnect</span>
+    </a>
+    <div class="land-nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#documents">Documents</a>
+      <a href="#features">Features</a>
+    </div>
+    <div style="display:flex;gap:8px;margin-left:16px">
+      <button class="lnav-login" onclick="showPage('login')">Sign In</button>
+      <button class="lnav-start" onclick="showPage('register')">Get Started →</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="land-hero">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Barangay Pusok, Lapu-Lapu City · Cebu
+      </div>
+      <h1>Barangay Documents,<br><em>Done Online.</em></h1>
+      <p>No more long queues at the barangay hall. Request your barangay clearance, certificates, and more — from your phone or computer, anytime.</p>
+      <div class="hero-btns">
+        <button class="hero-btn-main" onclick="showPage('register')">📄 Request a Document</button>
+        <button class="hero-btn-ghost" onclick="showPage('login')">Sign In →</button>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">6+</div>
+          <div class="hero-stat-lbl">Document Types</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">1 Day</div>
+          <div class="hero-stat-lbl">Processing Time</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">100%</div>
+          <div class="hero-stat-lbl">Online Process</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hc-head">
+          <div class="hc-icon">📋</div>
+          <div>
+            <div class="hc-title">Barangay Clearance</div>
+            <div class="hc-sub">REQ-2024-003 · Juan dela Cruz</div>
+          </div>
+        </div>
+        <div class="hc-steps">
+          <div class="hcs">
+            <div class="hcs-num">1</div>
+            <div class="hcs-txt">Request Submitted</div>
+            <span class="hcs-badge b-done">✅ Done</span>
+          </div>
+          <div class="hcs">
+            <div class="hcs-num">2</div>
+            <div class="hcs-txt">Under Review</div>
+            <span class="hcs-badge b-done">✅ Done</span>
+          </div>
+          <div class="hcs" style="border-color:var(--accent);background:var(--accent-lt)">
+            <div class="hcs-num">3</div>
+            <div class="hcs-txt" style="color:var(--accent2);font-weight:700">Ready to Claim!</div>
+            <span class="hcs-badge b-done" style="background:var(--accent);color:#fff">🏛️ Visit Hall</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:12px;color:var(--muted)">Fee paid via</div>
+          <svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="38" rx="7" fill="#0076FE"/>
+            <circle cx="22" cy="19" r="13" fill="white"/>
+            <text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial,sans-serif">G</text>
+            <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">GCash</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="land-section alt" id="how-it-works">
+    <div class="section-badge">Simple Process</div>
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Get your barangay documents in 3 easy steps — no need to visit the hall until your document is ready.</p>
+    <div class="hiw-grid">
+      <div class="hiw-card">
+        <div class="hiw-num">1</div>
+        <div class="hiw-icon">📝</div>
+        <div class="hiw-title">Create an Account</div>
+        <div class="hiw-desc">Register with your name, email, and mobile number. It only takes 2 minutes to get started.</div>
+      </div>
+      <div class="hiw-card">
+        <div class="hiw-num">2</div>
+        <div class="hiw-icon">📄</div>
+        <div class="hiw-title">Submit Your Request</div>
+        <div class="hiw-desc">Choose the document you need, fill in your details, and pay the fee online via GCash or Maya.</div>
+      </div>
+      <div class="hiw-card">
+        <div class="hiw-num">3</div>
+        <div class="hiw-icon">🔔</div>
+        <div class="hiw-title">Get Notified</div>
+        <div class="hiw-desc">We'll send you a notification when your document is ready. Just visit the barangay hall to claim it.</div>
+      </div>
+      <div class="hiw-card">
+        <div class="hiw-num">4</div>
+        <div class="hiw-icon">🏛️</div>
+        <div class="hiw-title">Claim Your Document</div>
+        <div class="hiw-desc">Bring a valid government ID to the barangay hall. Your document will be ready and waiting for you.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENTS -->
+  <section class="land-section" id="documents">
+    <div class="section-badge">Available Documents</div>
+    <h2 class="section-title">What Can You Request?</h2>
+    <p class="section-sub">We offer all the most commonly needed barangay documents, available online 24/7.</p>
+    <div class="docs-grid">
+      <div class="ldoc-card">
+        <div class="ldoc-icon">📋</div>
+        <div class="ldoc-name">Barangay Clearance</div>
+        <div class="ldoc-fee">₱50.00</div>
+        <div class="ldoc-days">⏱ 1 day processing</div>
+      </div>
+      <div class="ldoc-card">
+        <div class="ldoc-icon">🏠</div>
+        <div class="ldoc-name">Certificate of Residency</div>
+        <div class="ldoc-fee">₱50.00</div>
+        <div class="ldoc-days">⏱ 1 day processing</div>
+      </div>
+      <div class="ldoc-card">
+        <div class="ldoc-icon">📜</div>
+        <div class="ldoc-name">Indigency Certificate</div>
+        <div class="ldoc-fee" style="color:var(--success)">🆓 FREE</div>
+        <div class="ldoc-days">⏱ 1 day processing</div>
+      </div>
+      <div class="ldoc-card">
+        <div class="ldoc-icon">🏪</div>
+        <div class="ldoc-name">Business Clearance</div>
+        <div class="ldoc-fee">₱150.00</div>
+        <div class="ldoc-days">⏱ 2 days processing</div>
+      </div>
+      <div class="ldoc-card">
+        <div class="ldoc-icon">⭐</div>
+        <div class="ldoc-name">Good Moral Certificate</div>
+        <div class="ldoc-fee">₱50.00</div>
+        <div class="ldoc-days">⏱ 1 day processing</div>
+      </div>
+      <div class="ldoc-card">
+        <div class="ldoc-icon">👫</div>
+        <div class="ldoc-name">Cohabitation Certificate</div>
+        <div class="ldoc-fee">₱75.00</div>
+        <div class="ldoc-days">⏱ 1 day processing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="land-section alt" id="features">
+    <div class="section-badge">Why BarangayConnect</div>
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-sub">A complete digital system for barangay document services — built for residents and staff alike.</p>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📱</div>
+        <div>
+          <div class="feat-title">Works on Any Device</div>
+          <div class="feat-desc">Access from your phone, tablet, or computer. No app download needed — just open your browser.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💳</div>
+        <div>
+          <div class="feat-title">Online Payment</div>
+          <div class="feat-desc">Pay securely via GCash or Maya. No need to bring cash — just send money and enter your reference number.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔔</div>
+        <div>
+          <div class="feat-title">Real-Time Notifications</div>
+          <div class="feat-desc">Get notified instantly when your request is approved, processed, and ready for pickup.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <div>
+          <div class="feat-title">Track Your Request</div>
+          <div class="feat-desc">Use your reference number to check the status of your request anytime, even without logging in.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🛡️</div>
+        <div>
+          <div class="feat-title">Admin Dashboard</div>
+          <div class="feat-desc">Barangay staff get a full dashboard to manage requests, residents, reports, and settings.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div>
+          <div class="feat-title">Monthly Reports</div>
+          <div class="feat-desc">Automatic monthly summaries with total requests, fees collected, and processing analytics.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="land-cta">
+    <h2>Ready to request your document?</h2>
+    <p>Create a free account and submit your first request in minutes.</p>
+    <div class="cta-btns">
+      <button class="cta-white" onclick="showPage('register')">📄 Get Started — It's Free</button>
+      <button class="cta-ghost" onclick="showPage('login')">Already have an account? Sign In</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="land-footer">
+    <div class="lfoot-brand">
+      <div class="lfoot-logo">🏛️</div>
+      <span class="lfoot-name">BarangayConnect</span>
+    </div>
+    <p>© 2024 Barangay Pusok, Lapu-Lapu City, Cebu. All rights reserved.</p>
+    <p>📞 (032) 234-5678 &nbsp;·&nbsp; Barangay Hall, Pusok</p>
+  </footer>
+
+</div>
 <!-- LOGIN PAGE -->
-<div id="page-login" class="page active auth-page">
+<div id="page-login" class="page auth-page">
   <div class="auth-wrap">
     <div class="auth-brand">
       <div class="auth-logo">🏛️</div>
