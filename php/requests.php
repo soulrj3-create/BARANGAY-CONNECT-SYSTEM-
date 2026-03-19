@@ -81,7 +81,11 @@ function handleGet(): void {
     $pdo  = getDB();
     $stmt = $pdo->prepare("
         SELECT r.*, dt.name AS doc_name, dt.icon AS doc_icon, dt.fee AS doc_fee,
-               CONCAT(u.first_name,' ',u.last_name) AS resident_name, u.email AS resident_email
+               CONCAT(u.first_name,' ',u.last_name) AS resident_name,
+               u.email AS resident_email,
+               u.phone AS resident_phone,
+               u.address AS resident_address,
+               u.purok AS resident_purok
         FROM requests r
         JOIN document_types dt ON dt.id = r.doc_type_id
         JOIN users u ON u.id = r.user_id
