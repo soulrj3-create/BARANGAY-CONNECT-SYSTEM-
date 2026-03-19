@@ -112,10 +112,7 @@ INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, ad
 -- Resident users  (password: password123)
 INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, address, role) VALUES
 ('Juan',  'dela Cruz', 'juan@email.com',  '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09171234567', 'Pusok',  '123 Sampaguita St., Pusok', 'resident'),
-('Maria', 'Santos',    'maria@email.com', '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09281234567', 'Babag',  '45 Mabini St., Babag',      'resident'),
-('Pedro', 'Reyes',     'pedro@email.com', '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09091234567', 'Payo',   '88 Rizal Ave., Payo',       'resident'),
-('Ana',   'Gomez',     'ana@email.com',   '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09451234567', 'Gun-ob', '12 Quezon St., Gun-ob',     'resident'),
-('Carlo', 'Tan',       'carlo@email.com', '$2y$10$UHSfKDK3POp1zqcspd9ok.hE7Ym.N36yB6zbYPnRSS4Fy6Yf/nbT6', '09321234567', 'Pusok',  '67 Magsaysay St., Pusok',   'resident');
+
 
 -- Document types
 INSERT INTO document_types (name, icon, fee, processing_days, description) VALUES
