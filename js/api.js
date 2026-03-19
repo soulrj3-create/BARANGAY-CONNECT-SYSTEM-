@@ -117,16 +117,7 @@ function payBadge(method) {
     </svg>`;
 
   const mayaSvg = `
-    <svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="mb" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#00D26A"/><stop offset="100%" stop-color="#00AEEF"/>
-      </linearGradient></defs>
-      <rect width="110" height="38" rx="7" fill="url(#mb)"/>
-      <polygon points="10,30 17,10 24,30 17,23" fill="white" opacity="1"/>
-      <polygon points="17,30 24,10 31,30 24,23" fill="white" opacity="0.6"/>
-      <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800"
-        fill="white" font-family="Arial Black,Arial,sans-serif">maya</text>
-    </svg>`;
+    <svg width="52" height="18" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="7" fill="#00BFA5"/><text x="55" y="26" text-anchor="middle" font-size="18" font-weight="900" fill="white" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" letter-spacing="2">maya</text></svg>`;
 
   if (method === 'GCash') return `<span style="display:inline-flex;align-items:center">${gcashSvg}</span>`;
   if (method === 'Maya')  return `<span style="display:inline-flex;align-items:center">${mayaSvg}</span>`;
