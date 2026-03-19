@@ -11,7 +11,7 @@ async function checkSession() {
     currentUser = res.user;
     bootApp(currentUser);
   } else {
-    showPage('login');
+    showPage('landing');
   }
 }
 
