@@ -637,3 +637,14 @@ tbody tr:hover td { background:var(--surface3); }
   #page-landing .feat-grid  { grid-template-columns:1fr; }
   #page-landing .land-footer { flex-direction:column; text-align:center; gap:10px; }
 }
+
+/* ── Admin detail modal – wider ──────────────────────────── */
+#modal-detail .modal { max-width: 620px; }
+
+/* Refund box */
+.refund-box {
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  padding: 16px 18px;
+}

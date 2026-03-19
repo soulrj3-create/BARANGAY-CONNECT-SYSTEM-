@@ -15,11 +15,12 @@ async function checkSession() {
   }
 }
 
-// ── SHOW PAGE (login / register / app) ────────────────────
+// ── SHOW PAGE (landing / login / register / app) ──────────
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('page-' + name);
   if (pg) pg.classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 // ── BOOT APP AFTER LOGIN ──────────────────────────────────
@@ -27,13 +28,16 @@ function bootApp(user) {
   showPage('app');
 
   // Nav bar
-  g('nav-av').textContent   = user.first_name ? user.first_name[0].toUpperCase() : '?';
-  g('nav-name').textContent = user.first_name || 'User';
-  g('nav-role').textContent = user.role === 'admin' ? 'Admin' : 'Resident';
+  const av   = document.getElementById('nav-av');
+  const nm   = document.getElementById('nav-name');
+  const role = document.getElementById('nav-role');
+  if (av)   av.textContent   = user.first_name ? user.first_name[0].toUpperCase() : '?';
+  if (nm)   nm.textContent   = user.first_name || 'User';
+  if (role) role.textContent = user.role === 'admin' ? 'Admin' : 'Resident';
 
   // Show correct sidebar
-  const resNav = g('res-nav');
-  const admNav = g('adm-nav');
+  const resNav = document.getElementById('res-nav');
+  const admNav = document.getElementById('adm-nav');
   if (user.role === 'admin') {
     if (resNav) resNav.style.display = 'none';
     if (admNav) admNav.style.display = 'block';
@@ -44,7 +48,6 @@ function bootApp(user) {
     showPanel('res-home');
   }
 
-  // Load notification dot
   loadNotifCount();
 }
 
@@ -52,7 +55,7 @@ function bootApp(user) {
 async function loadNotifCount() {
   const res = await GET('users', 'notifications');
   if (res.success) {
-    const dot = g('notif-dot');
+    const dot = document.getElementById('notif-dot');
     if (dot) {
       if (res.unread_count > 0) {
         dot.style.display = 'flex';
@@ -64,45 +67,21 @@ async function loadNotifCount() {
   }
 }
 
-// ── DEMO LOGIN ────────────────────────────────────────────
-async function demoLogin(role) {
-  const creds = {
-    resident: { email: 'juan@email.com',   password: 'password123' },
-    admin:    { email: 'admin@barangay.ph', password: 'admin123'   },
-  };
-  const c = creds[role];
-  if (!c) return;
-
-  const btn = role === 'admin'
-    ? document.querySelector('[onclick="demoLogin(\'admin\')"]')
-    : document.querySelector('[onclick="demoLogin(\'resident\')"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
-
-  const res = await POST('auth', 'login', c);
-
-  if (btn) { btn.disabled = false; btn.textContent = role === 'admin' ? '🛡️ Admin Demo' : '👤 Resident Demo'; }
-
-  if (!res.success) { toast(res.message || 'Login failed.', 'error'); return; }
-
-  currentUser = res.user;
-  bootApp(currentUser);
-}
-
 // ── LOGIN ─────────────────────────────────────────────────
 async function doLogin() {
-  const email = v('li-email').trim().toLowerCase();
-  const pass  = v('li-pass').trim();
+  const email = (document.getElementById('li-email') || {value:''}).value.trim().toLowerCase();
+  const pass  = (document.getElementById('li-pass')  || {value:''}).value;
 
   if (!email || !pass) { toast('Please enter your email and password.', 'error'); return; }
 
-  const btn = g('btn-login');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  const btn = document.getElementById('btn-login');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
 
   const res = await POST('auth', 'login', { email, password: pass });
 
-  btn.disabled = false; btn.textContent = 'Sign In →';
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
 
-  if (!res.success) { toast(res.message || 'Login failed.', 'error'); return; }
+  if (!res.success) { toast(res.message || 'Invalid email or password.', 'error'); return; }
 
   currentUser = res.user;
   bootApp(currentUser);
@@ -111,14 +90,14 @@ async function doLogin() {
 // ── REGISTER ─────────────────────────────────────────────
 async function doRegister() {
   const payload = {
-    first_name:       v('rg-fn').trim(),
-    last_name:        v('rg-ln').trim(),
-    email:            v('rg-em').trim().toLowerCase(),
-    phone:            v('rg-ph').trim(),
-    purok:            v('rg-pu'),
-    address:          v('rg-ad').trim(),
-    password:         v('rg-pw'),
-    confirm_password: v('rg-cp'),
+    first_name:       (document.getElementById('rg-fn') || {value:''}).value.trim(),
+    last_name:        (document.getElementById('rg-ln') || {value:''}).value.trim(),
+    email:            (document.getElementById('rg-em') || {value:''}).value.trim().toLowerCase(),
+    phone:            (document.getElementById('rg-ph') || {value:''}).value.trim(),
+    purok:            (document.getElementById('rg-pu') || {value:''}).value,
+    address:          (document.getElementById('rg-ad') || {value:''}).value.trim(),
+    password:         (document.getElementById('rg-pw') || {value:''}).value,
+    confirm_password: (document.getElementById('rg-cp') || {value:''}).value,
   };
 
   if (!payload.first_name || !payload.last_name || !payload.email || !payload.phone || !payload.purok || !payload.password) {
@@ -131,27 +110,31 @@ async function doRegister() {
     toast('Passwords do not match.', 'error'); return;
   }
 
-  const btn = g('btn-register');
-  btn.disabled = true; btn.textContent = 'Creating account…';
+  const btn = document.getElementById('btn-register');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
 
   const res = await POST('auth', 'register', payload);
 
-  btn.disabled = false; btn.textContent = 'Create Account →';
+  if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
 
   if (!res.success) { toast(res.message || 'Registration failed.', 'error'); return; }
 
-  toast(res.message || 'Account created! You may now sign in.', 'success');
+  toast('Account created! You may now sign in.', 'success');
   showPage('login');
 }
 
-// ── LOGOUT ────────────────────────────────────────────────
+// ── LOGOUT → back to landing ──────────────────────────────
 async function doLogout() {
   await POST('auth', 'logout', {});
   currentUser = null;
-  showPage('login');
-  // Clear login fields
-  if (g('li-email')) g('li-email').value = '';
-  if (g('li-pass'))  g('li-pass').value  = '';
+
+  // Clear login form
+  const em = document.getElementById('li-email');
+  const pw = document.getElementById('li-pass');
+  if (em) em.value = '';
+  if (pw) pw.value = '';
+
+  showPage('landing');
 }
 
 // ── PROFILE PREFILL ───────────────────────────────────────
@@ -164,15 +147,16 @@ function prefillProfile(user) {
     'pf-ad': 'address',
   };
   Object.entries(map).forEach(([elId, key]) => {
-    const el = g(elId);
+    const el = document.getElementById(elId);
     if (el) el.value = user[key] || '';
   });
-  // Purok select
-  const purokSel = g('pf-pu');
+  const purokSel = document.getElementById('pf-pu');
   if (purokSel && user.purok) purokSel.value = user.purok;
 
-  // Profile display
-  if (g('prof-name-disp'))  g('prof-name-disp').textContent  = (user.first_name || '') + ' ' + (user.last_name || '');
-  if (g('prof-email-disp')) g('prof-email-disp').textContent = user.email || '';
-  if (g('prof-av-big'))     g('prof-av-big').textContent     = user.first_name ? user.first_name[0].toUpperCase() : '?';
+  const nd = document.getElementById('prof-name-disp');
+  const ed = document.getElementById('prof-email-disp');
+  const av = document.getElementById('prof-av-big');
+  if (nd) nd.textContent = ((user.first_name || '') + ' ' + (user.last_name || '')).trim();
+  if (ed) ed.textContent = user.email || '';
+  if (av) av.textContent = user.first_name ? user.first_name[0].toUpperCase() : '?';
 }

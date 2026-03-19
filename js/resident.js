@@ -50,10 +50,8 @@ async function renderResHome() {
   g('res-recent-tb').innerHTML = recent.length
     ? recent.map(r => `
       <tr>
-        <td>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);cursor:pointer"
-            onclick="viewRequest(${r.id})">${r.reference_no}</span>
-        </td>
+        <td><span style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);cursor:pointer"
+          onclick="viewRequest(${r.id})">${r.reference_no}</span></td>
         <td>${r.doc_name}</td>
         <td style="color:var(--muted2)">${r.date}</td>
         <td>${payBadge(r.payment_method)}</td>
@@ -75,10 +73,8 @@ async function renderResHistory() {
   g('hist-tb').innerHTML = res.requests.length
     ? res.requests.map(r => `
       <tr>
-        <td>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);cursor:pointer"
-            onclick="viewRequest(${r.id})">${r.reference_no}</span>
-        </td>
+        <td><span style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);cursor:pointer"
+          onclick="viewRequest(${r.id})">${r.reference_no}</span></td>
         <td>${r.doc_name}</td>
         <td style="color:var(--muted2)">${r.date}</td>
         <td style="color:var(--muted2)">${r.purpose}</td>
@@ -113,10 +109,10 @@ async function doTrack() {
   const idx = statusFlow.indexOf(r.status);
 
   const steps = [
-    { label:'Submitted',      sub:'Request received by the barangay',          done:true,     current:false },
-    { label:'Under Review',   sub:'Staff is reviewing your request',           done:idx>=1,   current:r.status==='processing' },
-    { label:'Ready to Claim', sub:'Document is ready at the barangay hall',    done:idx>=2,   current:r.status==='ready' },
-    { label:'Completed',      sub:'Document has been claimed',                 done:idx>=3,   current:false },
+    { label:'Submitted',      sub:'Request received by the barangay',       done:true,   current:false },
+    { label:'Under Review',   sub:'Staff is reviewing your request',        done:idx>=1, current:r.status==='processing' },
+    { label:'Ready to Claim', sub:'Document is ready at the barangay hall', done:idx>=2, current:r.status==='ready' },
+    { label:'Completed',      sub:'Document has been claimed',              done:idx>=3, current:false },
   ];
 
   el.innerHTML = `
@@ -132,11 +128,11 @@ async function doTrack() {
       ${r.status==='rejected' && r.reject_reason ? `<div class="alert alert-warn">⚠️ Rejected: ${r.reject_reason}</div>` : ''}
       ${r.status==='ready' ? `<div class="alert alert-success">✅ Your document is ready! Visit the barangay hall with a valid ID to claim it.</div>` : ''}
       <div class="timeline" style="margin-top:16px">
-        ${steps.map((s, i) => `
+        ${steps.map((s,i) => `
           <div class="tl">
             <div class="tl-col">
               <div class="tl-dot ${s.done?'done':''} ${s.current?'current':''}"></div>
-              ${i < steps.length - 1 ? `<div class="tl-line ${s.done?'done':''}"></div>` : ''}
+              ${i < steps.length-1 ? `<div class="tl-line ${s.done?'done':''}"></div>` : ''}
             </div>
             <div class="tl-text" style="padding-bottom:${i < steps.length-1 ? '22px' : '0'}">
               <div class="tl-label ${s.done?'done':''} ${s.current?'current':''}">${s.label}</div>
@@ -166,15 +162,13 @@ async function saveProfile() {
   btn.disabled = true; btn.textContent = 'Saving…';
 
   const res = await POST('users', 'update_profile', payload);
-
   btn.disabled = false; btn.textContent = 'Save Changes';
 
   if (!res.success) { toast(res.message, 'error'); return; }
 
-  // Update nav
   currentUser = res.user;
-  g('nav-av').textContent   = res.user.first_name[0].toUpperCase();
-  g('nav-name').textContent = res.user.first_name;
+  g('nav-av').textContent          = res.user.first_name[0].toUpperCase();
+  g('nav-name').textContent        = res.user.first_name;
   g('prof-name-disp').textContent  = res.user.first_name + ' ' + res.user.last_name;
   g('prof-email-disp').textContent = res.user.email;
   g('prof-av-big').textContent     = res.user.first_name[0].toUpperCase();
@@ -196,7 +190,6 @@ async function savePassword() {
   btn.disabled = true; btn.textContent = 'Saving…';
 
   const res = await POST('users', 'change_password', payload);
-
   btn.disabled = false; btn.textContent = 'Change Password';
 
   if (!res.success) { toast(res.message, 'error'); return; }
@@ -207,7 +200,7 @@ async function savePassword() {
   toast('Password changed successfully!', 'success');
 }
 
-// ── VIEW REQUEST DETAIL (resident) ────────────────────────
+// ── VIEW REQUEST DETAIL ───────────────────────────────────
 async function viewRequest(id) {
   showLoader();
   const res = await GET('requests', 'get', { id });
@@ -216,52 +209,118 @@ async function viewRequest(id) {
   if (!res.success) { toast(res.message, 'error'); return; }
   const r = res.request;
 
+  const isAdmin = currentUser?.role === 'admin';
   const statusFlow = ['pending','processing','ready','completed'];
   const idx = statusFlow.indexOf(r.status);
   const steps = [
-    { label:'Submitted',      done:true,    current:false },
-    { label:'Under Review',   done:idx>=1,  current:r.status==='processing' },
-    { label:'Ready to Claim', done:idx>=2,  current:r.status==='ready' },
-    { label:'Completed',      done:idx>=3,  current:false },
+    { label:'Submitted',      done:true,   current:false },
+    { label:'Under Review',   done:idx>=1, current:r.status==='processing' },
+    { label:'Ready to Claim', done:idx>=2, current:r.status==='ready' },
+    { label:'Completed',      done:idx>=3, current:false },
   ];
 
-  g('modal-detail-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)">
-      <span style="font-size:38px">${r.doc_icon || '📄'}</span>
-      <div style="flex:1">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px">${r.doc_name}</div>
-        <div style="color:var(--accent);font-size:13px;font-family:'Sora',sans-serif;margin-top:2px">${r.reference_no}</div>
+  const feeVal   = parseFloat(r.fee);
+  const isFree   = feeVal === 0;
+  const feeHtml  = isFree
+    ? '<span style="color:var(--success);font-weight:700">FREE</span>'
+    : `<span style="color:var(--accent);font-weight:700">₱${feeVal.toFixed(2)}</span>`;
+
+  // ── Payment refund box (admin only, paid + rejected) ──
+  const showRefund = isAdmin && !isFree && r.status === 'rejected';
+  const refundBox = showRefund ? `
+    <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:16px 18px;margin-bottom:18px">
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:#c2410c;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        💸 Refund Information
       </div>
-      ${badge(r.status)}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:20px;font-size:13.5px">
-      ${detailRow('Resident',       r.resident_name || (r.full_name))}
-      ${detailRow('Date Submitted', r.date || r.created_at?.slice(0,10))}
-      ${detailRow('Purpose',        r.purpose)}
-      ${detailRow('Fee',            parseFloat(r.fee)===0?'<span style="color:var(--success);font-weight:700">FREE</span>':'<span style="color:var(--accent);font-weight:700">₱'+parseFloat(r.fee).toFixed(2)+'</span>')}
-      ${detailRow('Payment',        payBadge(r.payment_method))}
-      ${detailRow('Reference #',    `<span style="font-size:12.5px">${r.payment_ref||'N/A'}</span>`)}
-    </div>
-    ${r.reject_reason ? `<div class="alert alert-warn">⚠️ Rejection Reason: ${r.reject_reason}</div>` : ''}
-    <div style="font-family:'Sora',sans-serif;font-size:11.5px;font-weight:700;color:var(--muted2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:13px">Progress</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+        ${detailRow('Amount to Refund', `<span style="font-size:16px;font-weight:800;color:#c2410c">₱${feeVal.toFixed(2)}</span>`)}
+        ${detailRow('Paid via', payBadge(r.payment_method))}
+        ${detailRow('Payment Ref #', `<span style="font-family:monospace;font-weight:700;font-size:13px;color:var(--text)">${r.payment_ref || 'N/A'}</span>`)}
+        ${detailRow('Refund To', `<span style="font-weight:700">${r.resident_name}</span>`)}
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #fed7aa">
+        <div style="font-size:11.5px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Resident Contact for Refund</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
+          <span>📞 <strong>${r.resident_phone || 'N/A'}</strong></span>
+          <span>✉️ <strong>${r.resident_email || 'N/A'}</strong></span>
+        </div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px;line-height:1.6">
+          ℹ️ Contact the resident using the info above to process the refund back to their ${r.payment_method} account.
+        </div>
+      </div>
+    </div>` : '';
+
+  // ── Resident info section (admin only) ────────────────
+  const residentSection = isAdmin ? `
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:18px">
+      <div style="font-family:'Sora',sans-serif;font-size:12px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">
+        👤 Resident Information
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+        ${detailRow('Full Name',    `<span style="font-weight:700">${r.full_name}</span>`)}
+        ${detailRow('Date of Birth', r.date_of_birth || 'N/A')}
+        ${detailRow('Civil Status', r.civil_status || 'N/A')}
+        ${detailRow('Mobile',       `<a href="tel:${r.phone}" style="color:var(--accent);font-weight:700">${r.phone || r.resident_phone || 'N/A'}</a>`)}
+        ${detailRow('Email',        `<a href="mailto:${r.resident_email}" style="color:var(--accent);font-weight:700;word-break:break-all">${r.resident_email || 'N/A'}</a>`)}
+        ${detailRow('Purok',        r.resident_purok || 'N/A')}
+      </div>
+      <div style="margin-top:10px">
+        ${detailRow('Address', r.address || r.resident_address || 'N/A')}
+      </div>
+    </div>` : '';
+
+  // ── Request details ───────────────────────────────────
+  const requestSection = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;font-size:13px">
+      ${detailRow('Document',      `${r.doc_icon || '📄'} <strong>${r.doc_name}</strong>`)}
+      ${detailRow('Reference #',   `<span style="font-family:'Sora',sans-serif;font-weight:800;color:var(--accent)">${r.reference_no}</span>`)}
+      ${detailRow('Date Filed',    r.date || (r.created_at || '').slice(0,10))}
+      ${detailRow('Purpose',       r.purpose)}
+      ${detailRow('Fee',           feeHtml)}
+      ${detailRow('Payment',       payBadge(r.payment_method))}
+      ${!isFree ? detailRow('Payment Ref #', `<span style="font-family:monospace;font-weight:700">${r.payment_ref || 'N/A'}</span>`) : ''}
+      ${detailRow('Payment Verified', r.payment_verified ? '✅ Verified' : '⏳ Pending')}
+    </div>`;
+
+  // ── Status timeline ───────────────────────────────────
+  const timeline = `
+    <div style="font-family:'Sora',sans-serif;font-size:11px;font-weight:800;color:var(--muted2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">Progress</div>
     <div class="timeline">
-      ${steps.map((s, i) => `
+      ${steps.map((s,i) => `
         <div class="tl">
           <div class="tl-col">
             <div class="tl-dot ${s.done?'done':''} ${s.current?'current':''}"></div>
-            ${i < steps.length - 1 ? `<div class="tl-line ${s.done?'done':''}"></div>` : ''}
+            ${i < steps.length-1 ? `<div class="tl-line ${s.done?'done':''}"></div>` : ''}
           </div>
-          <div class="tl-text" style="padding-bottom:${i < steps.length-1 ? '22px' : '0'}">
+          <div class="tl-text" style="padding-bottom:${i < steps.length-1 ? '18px' : '0'}">
             <div class="tl-label ${s.done?'done':''} ${s.current?'current':''}">${s.label}</div>
           </div>
         </div>`).join('')}
     </div>`;
 
-  // Footer: admin actions if admin, close if resident
+  g('modal-detail-body').innerHTML = `
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid var(--border)">
+      <span style="font-size:36px">${r.doc_icon || '📄'}</span>
+      <div style="flex:1">
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px">${r.doc_name}</div>
+        <div style="color:var(--accent);font-size:12px;font-family:'Sora',sans-serif;margin-top:2px">${r.reference_no}</div>
+      </div>
+      ${badge(r.status)}
+    </div>
+
+    ${r.reject_reason ? `<div class="alert alert-warn" style="margin-bottom:16px">⚠️ <strong>Rejected:</strong> ${r.reject_reason}</div>` : ''}
+    ${r.status === 'ready' ? `<div class="alert alert-success" style="margin-bottom:16px">✅ Document is ready for pickup at the barangay hall.</div>` : ''}
+
+    ${refundBox}
+    ${residentSection}
+    ${requestSection}
+    ${timeline}
+  `;
+
+  // Footer actions
   let foot = `<button class="btn btn-outline btn-sm" onclick="closeModal('modal-detail')">Close</button>`;
-  if (currentUser?.role === 'admin') {
-    foot = buildAdminActions(r) + foot;
-  }
+  if (isAdmin) foot = buildAdminActions(r) + foot;
   g('modal-detail-foot').innerHTML = foot;
 
   openModal('modal-detail');
@@ -269,7 +328,7 @@ async function viewRequest(id) {
 
 function detailRow(label, value) {
   return `<div>
-    <div style="color:var(--muted2);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px">${label}</div>
-    <div style="font-weight:600">${value}</div>
+    <div style="color:var(--muted2);font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px">${label}</div>
+    <div style="font-weight:600;font-size:13.5px">${value}</div>
   </div>`;
 }
