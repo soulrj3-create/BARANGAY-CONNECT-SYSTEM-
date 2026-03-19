@@ -25,7 +25,7 @@ switch ($action) {
 }
 
 // ── MY PROFILE ────────────────────────────────────────────
-function handleProfile(): void {
+function handleProfile() {
     $user = requireAuth();
     $pdo  = getDB();
     $stmt = $pdo->prepare("
@@ -39,7 +39,7 @@ function handleProfile(): void {
 }
 
 // ── UPDATE PROFILE ────────────────────────────────────────
-function handleUpdateProfile(): void {
+function handleUpdateProfile() {
     $user = requireAuth();
     $d    = getJson();
 
@@ -78,7 +78,7 @@ function handleUpdateProfile(): void {
 }
 
 // ── CHANGE PASSWORD ───────────────────────────────────────
-function handleChangePassword(): void {
+function handleChangePassword() {
     $user = requireAuth();
     $d    = getJson();
 
@@ -107,7 +107,7 @@ function handleChangePassword(): void {
 }
 
 // ── RESIDENTS (admin) ─────────────────────────────────────
-function handleResidents(): void {
+function handleResidents() {
     requireAuth('admin');
     $pdo    = getDB();
     $search = clean($_GET['search'] ?? '');
@@ -133,7 +133,7 @@ function handleResidents(): void {
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────
-function handleNotifications(): void {
+function handleNotifications() {
     $user = requireAuth();
     $pdo  = getDB();
     $stmt = $pdo->prepare("
@@ -155,7 +155,7 @@ function handleNotifications(): void {
 }
 
 // ── MARK NOTIFICATIONS READ ───────────────────────────────
-function handleMarkRead(): void {
+function handleMarkRead() {
     $user = requireAuth();
     $pdo  = getDB();
     $d    = getJson();

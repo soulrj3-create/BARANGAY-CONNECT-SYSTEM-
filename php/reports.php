@@ -24,7 +24,7 @@ switch ($action) {
 }
 
 // ── DASHBOARD STATS (admin) ───────────────────────────────
-function handleDashboard(): void {
+function handleDashboard() {
     requireAuth('admin');
     $pdo = getDB();
 
@@ -91,7 +91,7 @@ function handleDashboard(): void {
 }
 
 // ── MONTHLY REPORT ────────────────────────────────────────
-function handleMonthly(): void {
+function handleMonthly() {
     requireAuth('admin');
     $month = (int)($_GET['month'] ?? date('m'));
     $year  = (int)($_GET['year']  ?? date('Y'));
@@ -125,8 +125,9 @@ function handleMonthly(): void {
 }
 
 // ── GET SETTINGS ──────────────────────────────────────────
-function handleSettingsGet(): void {
-    requireAuth('admin');
+function handleSettingsGet() {
+    requireAuth(); // any logged-in user can read settings
+
     $pdo  = getDB();
     $stmt = $pdo->query("SELECT setting_key, setting_val FROM settings");
     $rows = $stmt->fetchAll();
@@ -136,7 +137,7 @@ function handleSettingsGet(): void {
 }
 
 // ── SAVE SETTINGS ─────────────────────────────────────────
-function handleSettingsSave(): void {
+function handleSettingsSave() {
     requireAuth('admin');
     $d   = getJson();
     $pdo = getDB();
@@ -162,7 +163,7 @@ function handleSettingsSave(): void {
 }
 
 // ── SAVE DOCUMENT FEES ────────────────────────────────────
-function handleFeesSave(): void {
+function handleFeesSave() {
     requireAuth('admin');
     $d   = getJson();   // [{ id: 1, fee: 50 }, …]
     $pdo = getDB();

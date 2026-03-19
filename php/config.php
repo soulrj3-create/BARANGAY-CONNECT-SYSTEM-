@@ -18,7 +18,7 @@ define('APP_VERSION', '1.0.0');
 define('SESSION_LIFETIME', 7200); // 2 hours
 
 // ── PDO singleton ──────────────────────────────────────────
-function getDB(): PDO {
+function getDB() {
     static $pdo = null;
     if ($pdo === null) {
         $dsn = sprintf(
@@ -41,7 +41,7 @@ function getDB(): PDO {
 }
 
 // ── Session helpers ────────────────────────────────────────
-function startSession(): void {
+function startSession() {
     if (session_status() === PHP_SESSION_NONE) {
         ini_set('session.cookie_httponly', '1');
         ini_set('session.use_strict_mode', '1');
@@ -75,13 +75,13 @@ function requireAuth(string $role = ''): array {
 }
 
 // ── JSON response helpers ──────────────────────────────────
-function jsonOk(array $data = [], string $message = 'Success'): void {
+function jsonOk(array $data = [], string $message = 'Success') {
     header('Content-Type: application/json');
     echo json_encode(['success' => true, 'message' => $message] + $data);
     exit;
 }
 
-function jsonError(string $message, int $code = 400): void {
+function jsonError(string $message, int $code = 400) {
     http_response_code($code);
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'message' => $message]);
