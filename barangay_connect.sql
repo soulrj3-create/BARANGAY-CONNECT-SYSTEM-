@@ -1,8 +1,8 @@
-
+-- ============================================================
 --  BarangayConnect - MySQL Database Schema
 --  Database: barangay_connect
---  Version:  1.0
-
+--  Version:  1.1  (includes gcash_number, maya_number)
+-- ============================================================
 
 CREATE DATABASE IF NOT EXISTS barangay_connect
   CHARACTER SET utf8mb4
@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS users (
     phone         VARCHAR(20)     DEFAULT NULL,
     purok         VARCHAR(60)     DEFAULT NULL,
     address       TEXT            DEFAULT NULL,
+    gcash_number  VARCHAR(20)     DEFAULT NULL,
+    maya_number   VARCHAR(20)     DEFAULT NULL,
     role          ENUM('resident','admin') NOT NULL DEFAULT 'resident',
     is_active     TINYINT(1)      NOT NULL DEFAULT 1,
     created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -107,29 +109,29 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- Admin user (password: admin123)
 INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, address, role) VALUES
-('Maria', 'Sta. Ana', 'admin@barangay.ph', '$2y$10$7NG/zJDYcy13kaxc0mmMCeE8g4lkuXSFj9wIsC1VoCEDo06sq.k/m', '09171111111', 'Staff', 'Barangay Hall, Pusok', 'admin');
+('Maria', 'Sta. Ana', 'admin@barangay.ph', '$2y$10$ndCsotnqSCdgR9JTYtiwAOWwG7PPNoyXpmqnHCqjylZxhYR0U.G8S', '09171111111', 'Staff', 'Barangay Hall, Pusok', 'admin');
 
 -- Resident user (password: password123)
 INSERT INTO users (first_name, last_name, email, password_hash, phone, purok, address, role) VALUES
-('Eduard', 'dela Cruz', 'Eduard@email.com', '$2y$10$XW8srlLZSp.foGEaNyUKg.b7dCcyVB5Kvn3BtS2JGH/lQ5k7Xu6NC', '09171234567', 'Pusok', '123 Sampaguita St., Pusok', 'resident');
+('Eduard', 'dela Cruz', 'Eduard@email.com', '$2y$10$Lp4xKDWo3JNgJlOGY4b0Duhzv1HbhTkzAAqjrEB7gNaCpwhx1qEbq', '09171234567', 'Pusok', '123 Sampaguita St., Pusok', 'resident');
 
 -- Document types
 INSERT INTO document_types (name, icon, fee, processing_days, description) VALUES
-('Barangay Clearance',       '📋', 50.00,  1, 'For employment, travel, or general purposes'),
-('Certificate of Residency', '🏠', 50.00,  1, 'Proof that you reside in the barangay'),
-('Indigency Certificate',    '📜',  0.00,  1, 'For financial assistance or scholarship'),
+('Barangay Clearance',       '📋',  50.00, 1, 'For employment, travel, or general purposes'),
+('Certificate of Residency', '🏠',  50.00, 1, 'Proof that you reside in the barangay'),
+('Indigency Certificate',    '📜',   0.00, 1, 'For financial assistance or scholarship'),
 ('Business Clearance',       '🏪', 150.00, 2, 'For opening or renewing a business permit'),
-('Good Moral Certificate',   '⭐', 50.00,  1, 'Character reference for school or employment'),
-('Cohabitation Certificate', '👫', 75.00,  1, 'Proof of living together as a couple');
+('Good Moral Certificate',   '⭐',  50.00, 1, 'Character reference for school or employment'),
+('Cohabitation Certificate', '👫',  75.00, 1, 'Proof of living together as a couple');
 
 -- Sample requests (user_id=2 is Eduard dela Cruz)
 INSERT INTO requests (reference_no, user_id, doc_type_id, full_name, date_of_birth, phone, civil_status, address, purpose, fee, payment_method, payment_ref, payment_verified, status) VALUES
-('REQ-2024-001', 2, 1, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Employment',       50.00, 'GCash', 'GCX-456789', 1, 'completed'),
-('REQ-2024-002', 2, 3, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Scholarship',       0.00, 'FREE',  'FREE',       1, 'completed'),
-('REQ-2024-003', 2, 1, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Bank loan',        50.00, 'GCash', 'GCX-789012', 1, 'ready'),
-('REQ-2024-004', 2, 2, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'School enrollment',50.00, 'Maya',  'MYA-321654', 1, 'pending');
+('REQ-2024-001', 2, 1, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Employment',        50.00, 'GCash', 'GCX-456789', 1, 'completed'),
+('REQ-2024-002', 2, 3, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Scholarship',        0.00, 'FREE',  'FREE',       1, 'completed'),
+('REQ-2024-003', 2, 1, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'Bank loan',         50.00, 'GCash', 'GCX-789012', 1, 'ready'),
+('REQ-2024-004', 2, 2, 'Eduard dela Cruz', '1995-03-15', '09171234567', 'Single', '123 Sampaguita St., Pusok', 'School enrollment', 50.00, 'Maya',  'MYA-321654', 1, 'pending');
 
--- Sample notifications for Eduard dela Cruz  (user_id=2)
+-- Sample notifications for Eduard (user_id=2)
 INSERT INTO notifications (user_id, title, message, icon, is_read) VALUES
 (2, 'Document Ready',     'Your Barangay Clearance (REQ-2024-003) is ready to claim at the barangay hall.', '✅', 0),
 (2, 'Request Processing', 'Your Certificate of Residency (REQ-2024-004) is now being processed.',           '🔄', 0),
