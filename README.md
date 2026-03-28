@@ -107,13 +107,13 @@ http://localhost/BARANGAY-CONNECT-SYSTEM-/
 <!-- Insert screenshot showing the Normal / Urgent priority cards -->
 ![Priority Tag Feature](docs/screenshots/priority-tag.png)
 
-### Resident Dashboard
-<!-- Insert screenshot of the resident dashboard -->
-![Resident Dashboard](docs/screenshots/resident-dashboard.png)
+### Resident Page
+<!-- Insert screenshot of the resident page -->
+![Resident Dashboard](docs/screenshots/resident-page.png)
 
-### Admin Dashboard
-<!-- Insert screenshot of the admin dashboard -->
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+### Admin Page
+<!-- Insert screenshot of the admin page -->
+![Admin Dashboard](docs/screenshots/admin-page.png)
 
 ---
 
