@@ -1,7 +1,7 @@
 [README.md](https://github.com/user-attachments/files/26319813/README.md)
 # 🏛️ BarangayConnect — Digital Barangay Services
 
-> **Team Bisaya Bytes** · Laboratory Work 2.3.5  
+> **Team Bisaya Bytes** · 
 > Barangay Pusok, Lapu-Lapu City, Cebu
 
 ---
