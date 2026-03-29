@@ -472,7 +472,7 @@ tbody tr:hover td { background:var(--surface3); }
 .pay-logo { display:flex; align-items:center; justify-content:center; }
 .pay-sub  { font-size:11.5px; color:var(--muted); }
 .pay-qr-box { background:var(--surface2); border:2px dashed var(--border2); border-radius:13px; padding:22px; text-align:center; }
-.qr-icon    { width:120px; height:120px; border-radius:12px; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; border:1px solid var(--border); }
+.qr-icon    { width:220px; height:220px; border-radius:12px; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; border:1px solid var(--border); }
 .pay-amount { font-family:'Sora',sans-serif; font-size:30px; font-weight:800; color:var(--accent2); margin:6px 0; }
 
 /* TIMELINE */

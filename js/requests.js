@@ -268,23 +268,14 @@ function selectPay(method) {
   const payRefIn  = document.getElementById('pay-ref');
 
   if (method === 'gcash') {
-    const num = settings.gcash_number || '0917-123-4567';
-    if (qrIcon) qrIcon.innerHTML = `
-      <svg width="90" height="36" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg">
-        <rect width="110" height="38" rx="8" fill="#0076FE"/>
-        <circle cx="22" cy="19" r="13" fill="white"/>
-        <text x="22" y="24.5" text-anchor="middle" font-size="16" font-weight="900" fill="#0076FE" font-family="Arial Black,Arial,sans-serif">G</text>
-        <text x="68" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Arial Black,Arial,sans-serif">GCash</text>
-      </svg>`;
-    if (infoText) infoText.textContent = 'Send via GCash Send Money';
-    if (acctText) acctText.textContent = num;
+    if (qrIcon) qrIcon.innerHTML = `<img src="/BARANGAY-CONNECT-SYSTEM-/images/gcash-qr.png" alt="GCash QR Code" style="width:100%;height:100%;object-fit:contain;border-radius:8px;"/>`;
+    if (infoText) infoText.textContent = 'Scan QR or send via GCash Send Money';
+    if (acctText) acctText.textContent = settings.gcash_number || '0917-123-4567';
     if (payRefIn) payRefIn.placeholder = 'Enter GCash reference number';
   } else {
-    const num = settings.maya_number || '0998-765-4321';
-    if (qrIcon) qrIcon.innerHTML = `
-      <svg width="90" height="36" viewBox="0 0 110 38" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="38" rx="8" fill="#00BFA5"/><text x="55" y="26" text-anchor="middle" font-size="18" font-weight="900" fill="white" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" letter-spacing="2">maya</text></svg>`;
-    if (infoText) infoText.textContent = 'Send via Maya Send Money';
-    if (acctText) acctText.textContent = num;
+    if (qrIcon) qrIcon.innerHTML = `<img src="/BARANGAY-CONNECT-SYSTEM-/images/maya-qr.png" alt="Maya QR Code" style="width:100%;height:100%;object-fit:contain;border-radius:8px;"/>`;
+    if (infoText) infoText.textContent = 'Scan QR or send via Maya Send Money';
+    if (acctText) acctText.textContent = settings.maya_number || '0998-765-4321';
     if (payRefIn) payRefIn.placeholder = 'Enter Maya reference number';
   }
 }
