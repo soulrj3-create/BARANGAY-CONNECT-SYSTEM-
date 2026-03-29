@@ -2,7 +2,7 @@
 # 🏛️ BarangayConnect — Digital Barangay Services
 
 > **Team Bisaya Bytes** · 
-> Barangay Pusok, Lapu-Lapu City, Cebu
+
 
 ---
 
